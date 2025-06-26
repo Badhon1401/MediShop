@@ -13,21 +13,16 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserVerificationMessage {
+public class UserVerificationMessageJpaEntity {
 
     @Id
     @GeneratedValue
     private UUID id;
+    @Column(nullable = false)
+    private String code;
     @Column(nullable = false, unique = true)
     private String userEmail;
     @Column(nullable = false)
-    private String code;
-    @Column(nullable = false)
     private Date expiry;
 
-    public UserVerificationMessage(String userEmail,String code, Date expiry) {
-        this.userEmail = userEmail;
-        this.code = code;
-        this.expiry = expiry;
-    }
 }

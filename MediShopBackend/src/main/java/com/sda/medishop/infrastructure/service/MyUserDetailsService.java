@@ -1,7 +1,7 @@
 package com.sda.medishop.infrastructure.service;
 
 import com.sda.medishop.domain.User;
-import com.sda.medishop.infrastructure.persistence.UserJpaEntity;
+import com.sda.medishop.infrastructure.persistence.entity.UserJpaEntity;
 import com.sda.medishop.infrastructure.persistence.repository.UserRepositoryImpl;
 import com.sda.medishop.infrastructure.utils.UserPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,12 +1,16 @@
 package com.sda.medishop.infrastructure.persistence.repository;
 
-import com.sda.medishop.domain.UserVerificationMessage;
+import com.sda.medishop.infrastructure.persistence.entity.UserVerificationMessageJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
-public interface UserVerificationMessageJpaRepository extends JpaRepository<UserVerificationMessage, UUID> {
-    UserVerificationMessage findByUserEmail(String userEmail);
+@Repository
+public interface UserVerificationMessageJpaRepository extends JpaRepository<UserVerificationMessageJpaEntity, UUID> {
+    UserVerificationMessageJpaEntity findByUserEmail(String userEmail);
 
+    @Transactional
     void deleteByUserEmail(String userEmail);
 }

@@ -18,6 +18,10 @@ public class User {
         this.contactNumber = contactNumber;
     }
 
+    public User(UUID id) {
+        this.id=id;
+    }
+
 
     public UUID getId() {
         return id;
