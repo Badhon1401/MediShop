@@ -1,0 +1,2 @@
+cd frontend/medishop-ui
+npm run dev
