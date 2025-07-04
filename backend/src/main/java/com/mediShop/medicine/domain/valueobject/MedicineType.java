@@ -8,7 +8,8 @@ public enum MedicineType {
     SYRUP("Syrup"),
     INJECTION("Injection"),
     CAPSULE("Capsule"),
-    OINTMENT("Ointment");
+    OINTMENT("Ointment"),
+    DROP("Drop");
 
     private final String displayName;
 
