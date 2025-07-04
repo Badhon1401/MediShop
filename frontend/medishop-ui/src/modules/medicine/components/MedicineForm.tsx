@@ -9,6 +9,7 @@ interface MedicineFormProps {
   onSubmit: (e: React.FormEvent) => void;
   submitText: string;
   isLoading?: boolean;
+  isEditMode: boolean; // To distinguish add vs edit mode
 }
 
 export const MedicineForm: React.FC<MedicineFormProps> = ({
@@ -17,6 +18,7 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({
   onSubmit,
   submitText,
   isLoading = false,
+  isEditMode,
 }) => {
   const handleInputChange = (field: keyof MedicineFormData, value: string) => {
     onFormChange({
@@ -71,32 +73,36 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({
         />
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Batch Number *
-        </label>
-        <input
-          type="text"
-          required
-          value={formData.batchNumber}
-          onChange={(e) => handleInputChange('batchNumber', e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder="Enter batch number"
-        />
-      </div>
+      {!isEditMode && (
+        <>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Batch Number *
+            </label>
+            <input
+              type="text"
+              required
+              value={formData.batchNumber}
+              onChange={(e) => handleInputChange('batchNumber', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Enter batch number"
+            />
+          </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Expiry Date *
-        </label>
-        <input
-          type="date"
-          required
-          value={formData.expiryDate}
-          onChange={(e) => handleInputChange('expiryDate', e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-        />
-      </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Expiry Date *
+            </label>
+            <input
+              type="date"
+              required
+              value={formData.expiryDate}
+              onChange={(e) => handleInputChange('expiryDate', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+        </>
+      )}
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">

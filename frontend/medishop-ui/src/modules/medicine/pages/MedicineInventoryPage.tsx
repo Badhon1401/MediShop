@@ -36,8 +36,8 @@ const Modal: React.FC<{
 export const MedicineInventoryPage: React.FC = () => {
   const { medicines, loading, fetchMedicines, searchMedicines, fetchExpiringMedicines } = useMedicines();
   const { createMedicine, updateMedicine, deleteMedicine, loading: actionLoading } = useMedicineActions();
-  
-  const [showAddModal, setShowAddModal] = useState(false);
+
+  const [showAddModal, setShowAddModal] = useState<boolean>(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingMedicine, setEditingMedicine] = useState<Medicine | null>(null);
   const [searchFilters, setSearchFilters] = useState<MedicineSearchFilters>({
@@ -73,11 +73,21 @@ export const MedicineInventoryPage: React.FC = () => {
 
   const handleAddMedicine = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Simple validation
+    if (!formData.name.trim()) {
+      alert("Name is required!");
+      return;
+    }
+    if (!formData.expiryDate) {
+      alert("Expiry date is required!");
+      return;
+    }
     const medicineData = {
       ...formData,
       supplierId: formData.supplierId ? parseInt(formData.supplierId) : undefined
     };
-    
+
     const result = await createMedicine(medicineData);
     if (result) {
       setShowAddModal(false);
@@ -89,13 +99,16 @@ export const MedicineInventoryPage: React.FC = () => {
   const handleUpdateMedicine = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingMedicine) return;
-    
+
     const medicineData = {
-      ...formData,
+      name: formData.name,
+      type: formData.type,
+      category: formData.category,
+      location: formData.location,
       medicineId: editingMedicine.medicineId,
       supplierId: formData.supplierId ? parseInt(formData.supplierId) : undefined
     };
-    
+
     const result = await updateMedicine(editingMedicine.medicineId, medicineData);
     if (result) {
       setShowEditModal(false);
@@ -106,11 +119,15 @@ export const MedicineInventoryPage: React.FC = () => {
   };
 
   const handleDeleteMedicine = async (id: number) => {
+    // const confirmDelete = window.confirm("Are you sure you want to delete this medicine?");
+    // if (!confirmDelete) return;
+
     const success = await deleteMedicine(id);
     if (success) {
       fetchMedicines();
     }
   };
+
 
   const handleEditMedicine = (medicine: Medicine) => {
     setEditingMedicine(medicine);
@@ -118,8 +135,8 @@ export const MedicineInventoryPage: React.FC = () => {
       name: medicine.name,
       type: medicine.type,
       category: medicine.category,
-      batchNumber: medicine.batchNumber,
-      expiryDate: medicine.expiryDate,
+      batchNumber: '', // Not used in edit, but kept for add form
+      expiryDate: '',
       location: medicine.location || '',
       supplierId: medicine.supplierId?.toString() || ''
     });
@@ -214,6 +231,7 @@ export const MedicineInventoryPage: React.FC = () => {
             onSubmit={handleAddMedicine}
             submitText="Add Medicine"
             isLoading={actionLoading}
+            isEditMode={false}
           />
         </Modal>
 
@@ -229,6 +247,7 @@ export const MedicineInventoryPage: React.FC = () => {
             onSubmit={handleUpdateMedicine}
             submitText="Update Medicine"
             isLoading={actionLoading}
+            isEditMode={true}
           />
         </Modal>
       </div>

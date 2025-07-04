@@ -41,8 +41,17 @@ export interface MedicineCreateRequest {
   supplierId?: number;
 }
 
-export interface MedicineUpdateRequest extends MedicineCreateRequest {
+// export interface MedicineUpdateRequest extends MedicineCreateRequest {
+//   medicineId: number;
+// }
+
+export interface MedicineUpdateRequest  {
   medicineId: number;
+  name: string;
+  type: MedicineType;
+  category: string;
+  location?: string;
+  supplierId?: number;
 }
 
 export interface MedicineListResponse {
