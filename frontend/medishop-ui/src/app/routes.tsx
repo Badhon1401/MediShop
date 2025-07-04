@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { MedicineInventoryPage } from '../modules/medicine';
 import { ROUTES } from '../shared/utils/constants';
-// import { MedicineForm } from '../modules/medicine/components/MedicineForm';
+
 
 // Layout component (to be implemented)
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
