@@ -91,3 +91,57 @@
 │
 ├── README.md                     # Project-level README
 └── .gitignore                     # Ignore files for both frontend + backend
+
+
+
+
+
+
+
+
+
+
+
+#package by feature
+
+mediShop/
+├── config/
+├── medicine/
+│   ├── application/
+│   │   ├── dto/
+│   │   └── usecase/
+│   ├── domain/
+│   │   ├── entity/
+│   │   ├── exception/
+│   │   ├── repository/
+│   │   └── valueobject/
+│   └── infrastructure/
+│       ├── persistence/
+│       │   ├── entity/
+│       │   ├── mapper/
+│       │   └── repository/
+│       └── web/
+│           ├── controller/
+│           └── exception/
+├── supplier/
+│   ├── application/
+│   │   ├── dto/
+│   │   └── usecase/
+│   ├── domain/
+│   │   ├── entity/
+│   │   ├── exception/
+│   │   ├── repository/
+│   │   └── valueobject/
+│   └── infrastructure/
+│       ├── persistence/
+│       │   ├── entity/
+│       │   ├── mapper/
+│       │   └── repository/
+│       └── web/
+│           ├── controller/
+│           └── exception/
+├── inventory/
+├── customer/
+├── user/
+├── sales/
+└── reporting/
