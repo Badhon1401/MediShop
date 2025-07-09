@@ -1,1 +1,9 @@
+# To run the backend, use the following command in the terminal:
+cd backend/src/main/java/com/mediShop/backend
 mvn clean spring-boot:run
+mvn clean                # optional, to clean the project
+mvn clean install        # optional, to build the project
+
+# kill the process running on port 8080
+sudo lsof -i :8080      # check which process is running on port 8080
+sudo kill -9 <PID>      # replace <PID> with the actual process ID
