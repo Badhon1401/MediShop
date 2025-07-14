@@ -19,6 +19,7 @@ public class GetExpiredInventoryUseCase implements UseCase<Void, List<InventoryR
 
     @Override
     public List<InventoryResponse> execute(Void input) {
+        System.out.println("----------------------------------GetExpiredInventoryUseCase.execute: ----------------------------------- ");
         List<Inventory> expiredInventories = inventoryRepository.findExpiredInventory();
 
         return expiredInventories.stream()

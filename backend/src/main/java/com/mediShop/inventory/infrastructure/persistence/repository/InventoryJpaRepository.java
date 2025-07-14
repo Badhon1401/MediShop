@@ -16,70 +16,70 @@ public interface InventoryJpaRepository extends JpaRepository<InventoryJpaEntity
 
 //    System.out.println("----------------------------------InventoryJpaRepository before DB: ----------------------------------- ");
     List<InventoryJpaEntity> findByMedicineId(Integer medicineId);
-    
+
     List<InventoryJpaEntity> findByBatchNumber(String batchNumber);
-    
+
     List<InventoryJpaEntity> findByCompanyNameContainingIgnoreCase(String companyName);
-    
+
     List<InventoryJpaEntity> findByLocationContainingIgnoreCase(String location);
-    
+
     List<InventoryJpaEntity> findByType(MedicineType type);
-    
+
     List<InventoryJpaEntity> findBySupplierId(Integer supplierId);
-    
+
     @Query("SELECT i FROM InventoryJpaEntity i WHERE i.expiryDate <= :date")
     List<InventoryJpaEntity> findExpiringBefore(@Param("date") LocalDate date);
-    
+
     @Query("SELECT i FROM InventoryJpaEntity i WHERE i.expiryDate < CURRENT_DATE")
     List<InventoryJpaEntity> findExpiredInventory();
-    
+
     @Query("SELECT i FROM InventoryJpaEntity i WHERE i.availableQuantity <= :threshold")
     List<InventoryJpaEntity> findLowStockItems(@Param("threshold") Integer threshold);
-    
+
     @Query("SELECT i FROM InventoryJpaEntity i WHERE i.availableQuantity = 0")
     List<InventoryJpaEntity> findOutOfStockItems();
-    
+
     List<InventoryJpaEntity> findByBuyingDateBetween(LocalDate startDate, LocalDate endDate);
-    
+
     List<InventoryJpaEntity> findByUnitPriceBetween(BigDecimal minPrice, BigDecimal maxPrice);
-    
+
     List<InventoryJpaEntity> findByAvailableQuantityGreaterThan(Integer quantity);
-    
+
     boolean existsByMedicineIdAndBatchNumber(Integer medicineId, String batchNumber);
-    
+
     @Query("SELECT SUM(i.unitPrice * i.availableQuantity) FROM InventoryJpaEntity i")
     BigDecimal getTotalInventoryValue();
-    
+
     @Query("SELECT SUM(i.availableQuantity) FROM InventoryJpaEntity i")
     Integer getTotalAvailableQuantity();
-    
+
     @Query("SELECT i FROM InventoryJpaEntity i WHERE i.availableQuantity <= 10")
     List<InventoryJpaEntity> findLowStockInventory();
-    
+
     @Query("SELECT i FROM InventoryJpaEntity i WHERE i.availableQuantity <= :threshold")
     List<InventoryJpaEntity> findLowStockInventoryWithThreshold(@Param("threshold") Integer threshold);
-    
+
     // New methods for expiring inventory with days parameter
     @Query("SELECT i FROM InventoryJpaEntity i WHERE i.expiryDate <= :expiryDate AND i.expiryDate >= CURRENT_DATE")
     List<InventoryJpaEntity> findExpiringInventory(@Param("expiryDate") LocalDate expiryDate);
-    
+
     // Count methods for stats
     @Query("SELECT COUNT(i) FROM InventoryJpaEntity i")
     long countTotalItems();
-    
+
     @Query("SELECT COUNT(i) FROM InventoryJpaEntity i WHERE i.expiryDate < CURRENT_DATE")
     long countExpiredItems();
-    
+
     @Query("SELECT COUNT(i) FROM InventoryJpaEntity i WHERE i.availableQuantity <= 10")
     long countLowStockItems();
-    
+
     @Query("SELECT COUNT(i) FROM InventoryJpaEntity i WHERE i.expiryDate <= :expiryDate AND i.expiryDate >= CURRENT_DATE")
     long countExpiringItems(@Param("expiryDate") LocalDate expiryDate);
 
     @Query("""
     SELECT i FROM InventoryJpaEntity i
     WHERE (:medicineName IS NULL OR LOWER(i.medicine.name) LIKE LOWER(CONCAT('%', :medicineName, '%')))
-      AND (:batchNumber IS NULL OR LOWER(i.batchNumber) LIKE LOWER(CONCAT('%', :batchNumber, '%')))
+      AND (:batchNumber IS NULL OR i.batchNumber LIKE CONCAT('%', :batchNumber, '%'))
       AND (:companyName IS NULL OR LOWER(i.companyName) LIKE LOWER(CONCAT('%', :companyName, '%')))
       AND (:type IS NULL OR i.type = :type)
      """)
@@ -92,7 +92,7 @@ public interface InventoryJpaRepository extends JpaRepository<InventoryJpaEntity
 
 //    System.out.println("----------------------------------InventoryJpaRepository after DB: ----------------------------------- ");
 
-    
+
 //     @Query("SELECT i FROM InventoryJpaEntity i " +
 //            "JOIN MedicineJpaEntity m ON i.medicineId = m.medicineId " +
 //            "WHERE (:medicineName IS NULL OR m.name LIKE %:medicineName%) " +

@@ -82,9 +82,7 @@ public class Inventory {
         if (expiryDate == null) {
             throw new IllegalArgumentException("Expiry date cannot be null");
         }
-        if (expiryDate.isBefore(LocalDate.now())) {
-            throw new IllegalArgumentException("Expiry date cannot be in the past");
-        }
+        // Removed validation for past expiry dates to allow retrieval of expired inventory
         return expiryDate;
     }
 

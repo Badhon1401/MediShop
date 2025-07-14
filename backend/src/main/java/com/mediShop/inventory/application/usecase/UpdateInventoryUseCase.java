@@ -20,6 +20,7 @@ public class UpdateInventoryUseCase implements UseCase<UpdateInventoryRequest, I
 
     @Override
     public InventoryResponse execute(UpdateInventoryRequest request) {
+        System.out.println("----------------------------------UpdateInventoryUseCase.execute: ----------------------------------- ");
         Inventory inventory = inventoryRepository.findById(request.getInventoryId())
                 .orElseThrow(() -> new InventoryNotFoundException(request.getInventoryId()));
 
