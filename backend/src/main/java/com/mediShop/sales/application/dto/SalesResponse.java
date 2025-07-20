@@ -1,52 +1,32 @@
-package com.mediShop.sales.domain.entity;
+package com.mediShop.sales.application.dto;
 
 
-import jakarta.persistence.*;
 import java.time.LocalDate;
 
 
-@Entity
-@Table(name = "sales")
-public class Sales {
+public class SalesResponse {
   
-   @Id
-   @GeneratedValue(strategy = GenerationType.IDENTITY)
-   @Column(name = "items_id")
    private Integer itemsId;
-  
-   @Column(name = "sales_id", nullable = false)
    private Integer salesId;
-  
-   @Column(name = "customer_phone_number", nullable = false)
    private String customerPhoneNumber;
-  
-   @Column(name = "sales_date", nullable = false)
    private LocalDate salesDate;
-  
-   @Column(name = "medicine_name", nullable = false)
    private String medicineName;
-  
-   @Column(name = "medicine_unit_price", nullable = false)
    private Double medicineUnitPrice;
-  
-   @Column(name = "per_medicine_total_quantity", nullable = false)
    private Integer perMedicineTotalQuantity;
-  
-   @Column(name = "per_medicine_total_amount", nullable = false)
    private Double perMedicineTotalAmount;
-  
-   @Column(name = "total_price_per_customer_transaction", nullable = false)
    private Double totalPricePerCustomerTransaction;
 
 
    // Default constructor
-   public Sales() {}
+   public SalesResponse() {}
 
 
    // Parameterized constructor
-   public Sales(Integer salesId, String customerPhoneNumber, LocalDate salesDate,
-               String medicineName, Double medicineUnitPrice, Integer perMedicineTotalQuantity,
-               Double perMedicineTotalAmount, Double totalPricePerCustomerTransaction) {
+   public SalesResponse(Integer itemsId, Integer salesId, String customerPhoneNumber,
+                       LocalDate salesDate, String medicineName, Double medicineUnitPrice,
+                       Integer perMedicineTotalQuantity, Double perMedicineTotalAmount,
+                       Double totalPricePerCustomerTransaction) {
+       this.itemsId = itemsId;
        this.salesId = salesId;
        this.customerPhoneNumber = customerPhoneNumber;
        this.salesDate = salesDate;
@@ -147,21 +127,4 @@ public class Sales {
    public void setTotalPricePerCustomerTransaction(Double totalPricePerCustomerTransaction) {
        this.totalPricePerCustomerTransaction = totalPricePerCustomerTransaction;
    }
-
-
-   @Override
-   public String toString() {
-       return "Sales{" +
-               "itemsId=" + itemsId +
-               ", salesId=" + salesId +
-               ", customerPhoneNumber='" + customerPhoneNumber + '\'' +
-               ", salesDate=" + salesDate +
-               ", medicineName='" + medicineName + '\'' +
-               ", medicineUnitPrice=" + medicineUnitPrice +
-               ", perMedicineTotalQuantity=" + perMedicineTotalQuantity +
-               ", perMedicineTotalAmount=" + perMedicineTotalAmount +
-               ", totalPricePerCustomerTransaction=" + totalPricePerCustomerTransaction +
-               '}';
-   }
 }
-

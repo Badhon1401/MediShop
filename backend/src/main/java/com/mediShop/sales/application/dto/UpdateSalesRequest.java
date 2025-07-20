@@ -1,61 +1,41 @@
-package com.mediShop.sales.domain.entity;
+package com.mediShop.sales.application.dto;
 
 
-import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Positive;
 import java.time.LocalDate;
 
 
-@Entity
-@Table(name = "sales")
-public class Sales {
+public class UpdateSalesRequest {
   
-   @Id
-   @GeneratedValue(strategy = GenerationType.IDENTITY)
-   @Column(name = "items_id")
+   @NotNull(message = "Items ID is required")
    private Integer itemsId;
   
-   @Column(name = "sales_id", nullable = false)
    private Integer salesId;
   
-   @Column(name = "customer_phone_number", nullable = false)
+   @Pattern(regexp = "^(\\+88)?01[3-9]\\d{8}$", message = "Invalid Bangladeshi phone number")
    private String customerPhoneNumber;
   
-   @Column(name = "sales_date", nullable = false)
    private LocalDate salesDate;
   
-   @Column(name = "medicine_name", nullable = false)
    private String medicineName;
   
-   @Column(name = "medicine_unit_price", nullable = false)
+   @Positive(message = "Medicine unit price must be positive")
    private Double medicineUnitPrice;
   
-   @Column(name = "per_medicine_total_quantity", nullable = false)
+   @Positive(message = "Quantity must be positive")
    private Integer perMedicineTotalQuantity;
   
-   @Column(name = "per_medicine_total_amount", nullable = false)
+   @Positive(message = "Total amount must be positive")
    private Double perMedicineTotalAmount;
   
-   @Column(name = "total_price_per_customer_transaction", nullable = false)
+   @Positive(message = "Total price must be positive")
    private Double totalPricePerCustomerTransaction;
 
 
    // Default constructor
-   public Sales() {}
-
-
-   // Parameterized constructor
-   public Sales(Integer salesId, String customerPhoneNumber, LocalDate salesDate,
-               String medicineName, Double medicineUnitPrice, Integer perMedicineTotalQuantity,
-               Double perMedicineTotalAmount, Double totalPricePerCustomerTransaction) {
-       this.salesId = salesId;
-       this.customerPhoneNumber = customerPhoneNumber;
-       this.salesDate = salesDate;
-       this.medicineName = medicineName;
-       this.medicineUnitPrice = medicineUnitPrice;
-       this.perMedicineTotalQuantity = perMedicineTotalQuantity;
-       this.perMedicineTotalAmount = perMedicineTotalAmount;
-       this.totalPricePerCustomerTransaction = totalPricePerCustomerTransaction;
-   }
+   public UpdateSalesRequest() {}
 
 
    // Getters and Setters
@@ -147,21 +127,4 @@ public class Sales {
    public void setTotalPricePerCustomerTransaction(Double totalPricePerCustomerTransaction) {
        this.totalPricePerCustomerTransaction = totalPricePerCustomerTransaction;
    }
-
-
-   @Override
-   public String toString() {
-       return "Sales{" +
-               "itemsId=" + itemsId +
-               ", salesId=" + salesId +
-               ", customerPhoneNumber='" + customerPhoneNumber + '\'' +
-               ", salesDate=" + salesDate +
-               ", medicineName='" + medicineName + '\'' +
-               ", medicineUnitPrice=" + medicineUnitPrice +
-               ", perMedicineTotalQuantity=" + perMedicineTotalQuantity +
-               ", perMedicineTotalAmount=" + perMedicineTotalAmount +
-               ", totalPricePerCustomerTransaction=" + totalPricePerCustomerTransaction +
-               '}';
-   }
 }
-
