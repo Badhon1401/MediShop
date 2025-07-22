@@ -2,7 +2,7 @@
 
 ## Base URL
 ```
-http://localhost:8080/api/customers
+http://localhost:8080/mediShop/
 ```
 
 ## 1. Create Customer
