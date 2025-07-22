@@ -2,7 +2,7 @@
 
 ## Base URL
 ```
-http://localhost:8080/mediShop/
+http://localhost:8080/mediShop
 ```
 
 ## 1. Create Customer
@@ -12,7 +12,7 @@ http://localhost:8080/mediShop/
 ```json
 {
     "name": "John Doe",
-    "contactNumber": "+1234567890",
+    "contactNumber": "01512345678",
     "registrationDate": "2024-01-15"
 }
 ```
@@ -21,17 +21,17 @@ http://localhost:8080/mediShop/
 ```json
 {
     "name": "Jane Smith",
-    "contactNumber": "+9876543210"
+    "contactNumber": "01512345678"
 }
 ```
 
 ### cURL Example
 ```bash
-curl -X POST http://localhost:8080/api/customers \
+curl -X POST http://localhost:8080/mediShop/api/customers \
   -H "Content-Type: application/json" \
   -d '{
     "name": "John Doe",
-    "contactNumber": "+1234567890",
+    "contactNumber": "01512345678",
     "registrationDate": "2024-01-15"
   }'
 ```
@@ -41,7 +41,7 @@ curl -X POST http://localhost:8080/api/customers \
 {
     "customerId": 1,
     "name": "John Doe",
-    "contactNumber": "+1234567890",
+    "contactNumber": "01512345678",
     "registrationDate": "2024-01-15"
 }
 ```
@@ -53,7 +53,7 @@ curl -X POST http://localhost:8080/api/customers \
 
 ### cURL Example
 ```bash
-curl -X GET http://localhost:8080/api/customers
+curl -X GET http://localhost:8080/mediShop/api/customers
 ```
 
 ### Expected Response (200 OK)
@@ -62,13 +62,13 @@ curl -X GET http://localhost:8080/api/customers
     {
         "customerId": 1,
         "name": "John Doe",
-        "contactNumber": "+1234567890",
+        "contactNumber": "01512345678",
         "registrationDate": "2024-01-15"
     },
     {
         "customerId": 2,
         "name": "Jane Smith",
-        "contactNumber": "+9876543210",
+        "contactNumber": "01512345678",
         "registrationDate": "2024-01-16"
     }
 ]
@@ -81,7 +81,7 @@ curl -X GET http://localhost:8080/api/customers
 
 ### cURL Example
 ```bash
-curl -X GET http://localhost:8080/api/customers/1
+curl -X GET http://localhost:8080/mediShop/api/customers/1
 ```
 
 ### Expected Response (200 OK)
@@ -89,7 +89,7 @@ curl -X GET http://localhost:8080/api/customers/1
 {
     "customerId": 1,
     "name": "John Doe",
-    "contactNumber": "+1234567890",
+    "contactNumber": "01512345678",
     "registrationDate": "2024-01-15"
 }
 ```
@@ -113,18 +113,18 @@ curl -X GET http://localhost:8080/api/customers/1
 ```json
 {
     "name": "John Doe Updated",
-    "contactNumber": "+1234567891",
+    "contactNumber": "01512345678",
     "registrationDate": "2024-01-15"
 }
 ```
 
 ### cURL Example
 ```bash
-curl -X PUT http://localhost:8080/api/customers/1 \
+curl -X PUT http://localhost:8080/mediShop/api/customers/1 \
   -H "Content-Type: application/json" \
   -d '{
     "name": "John Doe Updated",
-    "contactNumber": "+1234567891",
+    "contactNumber": "01512345678",
     "registrationDate": "2024-01-15"
   }'
 ```
@@ -134,7 +134,7 @@ curl -X PUT http://localhost:8080/api/customers/1 \
 {
     "customerId": 1,
     "name": "John Doe Updated",
-    "contactNumber": "+1234567891",
+    "contactNumber": "01512345678",
     "registrationDate": "2024-01-15"
 }
 ```
@@ -146,7 +146,7 @@ curl -X PUT http://localhost:8080/api/customers/1 \
 
 ### cURL Example
 ```bash
-curl -X DELETE http://localhost:8080/api/customers/1
+curl -X DELETE http://localhost:8080/mediShop/api/customers/1
 ```
 
 ### Expected Response (204 No Content)
@@ -169,7 +169,7 @@ curl -X DELETE http://localhost:8080/api/customers/1
 ### Request Body - Search by contact number
 ```json
 {
-    "contactNumber": "+1234567890"
+    "contactNumber": "01512345678"
 }
 ```
 
@@ -192,7 +192,7 @@ curl -X DELETE http://localhost:8080/api/customers/1
 
 ### cURL Example
 ```bash
-curl -X POST http://localhost:8080/api/customers/search \
+curl -X POST http://localhost:8080/mediShop/api/customers/search \
   -H "Content-Type: application/json" \
   -d '{
     "name": "John",
@@ -207,7 +207,7 @@ curl -X POST http://localhost:8080/api/customers/search \
     {
         "customerId": 1,
         "name": "John Doe",
-        "contactNumber": "+1234567890",
+        "contactNumber": "01512345678",
         "registrationDate": "2024-01-15"
     }
 ]
@@ -225,7 +225,7 @@ GET /api/customers/search?name=John
 
 ### Search by contact number (exact match)
 ```
-GET /api/customers/search?contactNumber=+1234567890
+GET /api/customers/search?contactNumber=01512345678
 ```
 
 ### Search by registration date range
@@ -241,16 +241,16 @@ GET /api/customers/search?name=John&registrationDateFrom=2024-01-01&registration
 ### cURL Examples
 ```bash
 # Search by name
-curl -X GET "http://localhost:8080/api/customers/search?name=John"
+curl -X GET "http://localhost:8080/mediShop/api/customers/search?name=John"
 
 # Search by contact number
-curl -X GET "http://localhost:8080/api/customers/search?contactNumber=%2B1234567890"
+curl -X GET "http://localhost:8080/mediShop/api/customers/search?contactNumber=%2B01512345678"
 
 # Search by date range
-curl -X GET "http://localhost:8080/api/customers/search?registrationDateFrom=2024-01-01&registrationDateTo=2024-01-31"
+curl -X GET "http://localhost:8080/mediShop/api/customers/search?registrationDateFrom=2024-01-01&registrationDateTo=2024-01-31"
 
 # Combined search
-curl -X GET "http://localhost:8080/api/customers/search?name=John&registrationDateFrom=2024-01-01&registrationDateTo=2024-12-31"
+curl -X GET "http://localhost:8080/mediShop/api/customers/search?name=John&registrationDateFrom=2024-01-01&registrationDateTo=2024-12-31"
 ```
 
 ### Expected Response (200 OK)
@@ -259,7 +259,7 @@ curl -X GET "http://localhost:8080/api/customers/search?name=John&registrationDa
     {
         "customerId": 1,
         "name": "John Doe",
-        "contactNumber": "+1234567890",
+        "contactNumber": "01512345678",
         "registrationDate": "2024-01-15"
     }
 ]
