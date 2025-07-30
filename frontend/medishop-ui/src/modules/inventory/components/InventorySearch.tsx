@@ -1,44 +1,42 @@
 // src/modules/inventory/components/InventorySearch.tsx
 
 import React, { useState } from 'react';
-import type { MedicineType, ExpiryStatus, StockLevel, InventorySearchFilters } from '../types';
-
-import { MEDICINE_TYPE, EXPIRY_STATUS, STOCK_LEVEL } from '../types'; 
-
-// const med: MedicineType = MEDICINE_TYPE.TABLET;
-
-// const stock: StockLevel = STOCK_LEVEL.LOW_STOCK;
+import type{ MedicineType, InventoryFilters } from '../types';
+import { MEDICINE_TYPE } from '../types'; 
 
 interface InventorySearchProps {
-  onSearch: (filters: InventorySearchFilters) => void;
-  onReset: () => void;
+  onSearch: (filters: InventoryFilters) => void;
+  onClear: () => void;
+  // onReset: () => void;
   isLoading?: boolean;
 }
 
-export const InventorySearch: React.FC<InventorySearchProps> = ({
+const InventorySearch: React.FC<InventorySearchProps> = ({
   onSearch,
-  onReset,
+  onClear,
   isLoading = false,
 }) => {
-  const [filters, setFilters] = useState<InventorySearchFilters>({
+  const [filters, setFilters] = useState<InventoryFilters>({
     medicineName: '',
-    batchNumber: '',
     companyName: '',
+    type: '',
     location: '',
-    type: undefined,
-    expiryStatus: undefined,
-    stockLevel: undefined,
+    minStock: 0,
+    maxStock: 0,
+    expiryStatus: 'all',
+    sortBy: 'medicineName',
+    sortOrder: 'asc',
   });
 
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    const { name, value } = e.target;
+    const { name, value, type } = e.target;
     setFilters(prev => ({
       ...prev,
-      [name]: value === '' ? undefined : value,
+      [name]: type === 'number' ? (value === '' ? 0 : Number(value)) : value,
     }));
   };
 
@@ -47,210 +45,263 @@ export const InventorySearch: React.FC<InventorySearchProps> = ({
     onSearch(filters);
   };
 
-  const handleReset = () => {
-    const resetFilters: InventorySearchFilters = {
+  const handleClear = () => {
+    const clearedFilters: InventoryFilters = {
       medicineName: '',
-      batchNumber: '',
       companyName: '',
+      type: '',
       location: '',
-      type: undefined,
-      expiryStatus: undefined,
-      stockLevel: undefined,
+      minStock: 0,
+      maxStock: 0,
+      expiryStatus: 'all',
+      sortBy: 'medicineName',
+      sortOrder: 'asc',
     };
-    setFilters(resetFilters);
-    onReset();
+    setFilters(clearedFilters);
+    onClear();
   };
 
-  const hasActiveFilters = Object.values(filters).some(value => 
-    value !== undefined && value !== ''
-  );
+  const medicineTypes = Object.values(MEDICINE_TYPE);
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-800">Search Inventory</h3>
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-lg font-semibold text-gray-800">Search & Filter Inventory</h3>
         <button
           type="button"
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="text-blue-600 hover:text-blue-800 focus:outline-none"
+          onClick={() => setShowAdvanced(!showAdvanced)}
+          className="text-blue-600 hover:text-blue-800 font-medium"
         >
-          {isExpanded ? 'Hide Filters' : 'Show All Filters'}
+          {showAdvanced ? 'Hide' : 'Show'} Advanced Filters
         </button>
       </div>
 
-      <form onSubmit={handleSearch} className="space-y-4">
+      <form onSubmit={handleSearch}>
         {/* Basic Search */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           <div>
-            <label htmlFor="medicineName" className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Medicine Name
             </label>
             <input
               type="text"
-              id="medicineName"
               name="medicineName"
-              value={filters.medicineName || ''}
+              value={filters.medicineName}
               onChange={handleInputChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Search by medicine name..."
+              placeholder="Search by medicine name"
             />
           </div>
 
           <div>
-            <label htmlFor="batchNumber" className="block text-sm font-medium text-gray-700 mb-1">
-              Batch Number
-            </label>
-            <input
-              type="text"
-              id="batchNumber"
-              name="batchNumber"
-              value={filters.batchNumber || ''}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Search by batch number..."
-            />
-          </div>
-
-          <div>
-            <label htmlFor="companyName" className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Company Name
             </label>
             <input
               type="text"
-              id="companyName"
               name="companyName"
-              value={filters.companyName || ''}
+              value={filters.companyName}
               onChange={handleInputChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Search by company name..."
+              placeholder="Search by company name"
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Medicine Type
+            </label>
+            <select
+              name="type"
+              value={filters.type}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">All Types</option>
+              {medicineTypes.map(type => (
+                <option key={type} value={type}>
+                  {type.replace('_', ' ')}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 
         {/* Advanced Filters */}
-        {isExpanded && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-4 border-t border-gray-200">
-            <div>
-              <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">
-                Location
-              </label>
-              <input
-                type="text"
-                id="location"
-                name="location"
-                value={filters.location || ''}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Search by location..."
-              />
+        {showAdvanced && (
+          <div className="border-t pt-4 mb-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Location
+                </label>
+                <input
+                  type="text"
+                  name="location"
+                  value={filters.location}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Storage location"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Min Stock
+                </label>
+                <input
+                  type="number"
+                  name="minStock"
+                  value={filters.minStock || ''}
+                  onChange={handleInputChange}
+                  min="0"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Minimum stock"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Max Stock
+                </label>
+                <input
+                  type="number"
+                  name="maxStock"
+                  value={filters.maxStock || ''}
+                  onChange={handleInputChange}
+                  min="0"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Maximum stock"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Expiry Status
+                </label>
+                <select
+                  name="expiryStatus"
+                  value={filters.expiryStatus}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="all">All Items</option>
+                  <option value="expired">Expired</option>
+                  <option value="expiring">Expiring Soon</option>
+                  <option value="valid">Valid</option>
+                </select>
+              </div>
             </div>
 
-            <div>
-              <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-1">
-                Medicine Type
-              </label>
-              <select
-                id="type"
-                name="type"
-                value={filters.type || ''}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">All Types</option>
-                {Object.values(MEDICINE_TYPE).map(type => (
-                  <option key={type} value={type}>
-                    {type.toLowerCase().replace('_', ' ')}
-                  </option>
-                ))}
-              </select>
-            </div>
+            {/* Sorting Options */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Sort By
+                </label>
+                <select
+                  name="sortBy"
+                  value={filters.sortBy}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="medicineName">Medicine Name</option>
+                  <option value="expiryDate">Expiry Date</option>
+                  <option value="availableQuantity">Available Quantity</option>
+                  <option value="lastUpdated">Last Updated</option>
+                </select>
+              </div>
 
-            <div>
-              <label htmlFor="expiryStatus" className="block text-sm font-medium text-gray-700 mb-1">
-                Expiry Status
-              </label>
-              <select
-                id="expiryStatus"
-                name="expiryStatus"
-                value={filters.expiryStatus || ''}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">All Status</option>
-                <option value={EXPIRY_STATUS.VALID}>Valid</option>
-                <option value={EXPIRY_STATUS.EXPIRING_SOON}>Expiring Soon</option>
-                <option value={EXPIRY_STATUS.EXPIRED}>Expired</option>
-              </select>
-            </div>
-
-            <div>
-              <label htmlFor="stockLevel" className="block text-sm font-medium text-gray-700 mb-1">
-                Stock Level
-              </label>
-              <select
-                id="stockLevel"
-                name="stockLevel"
-                value={filters.stockLevel || ''}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">All Levels</option>
-                <option value={STOCK_LEVEL.ADEQUATE}>Adequate</option>
-                <option value={STOCK_LEVEL.LOW_STOCK}>Low Stock</option>
-                <option value={STOCK_LEVEL.OUT_OF_STOCK}>Out of Stock</option>
-              </select>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Sort Order
+                </label>
+                <select
+                  name="sortOrder"
+                  value={filters.sortOrder}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="asc">Ascending</option>
+                  <option value="desc">Descending</option>
+                </select>
+              </div>
             </div>
           </div>
         )}
 
         {/* Action Buttons */}
-        <div className="flex justify-between items-center pt-4">
-          <div className="flex space-x-3">
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-            >
-              {isLoading ? (
-                <>
-                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Searching...
-                </>
-              ) : (
-                <>
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                  Search
-                </>
-              )}
-            </button>
-
-            {hasActiveFilters && (
-              <button
-                type="button"
-                onClick={handleReset}
-                disabled={isLoading}
-                className="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:opacity-50 flex items-center"
-              >
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
-                Reset
-              </button>
-            )}
-          </div>
-
-          {hasActiveFilters && (
-            <div className="text-sm text-gray-600">
-              Active filters applied
-            </div>
-          )}
+        <div className="flex justify-end space-x-4">
+          <button
+            type="button"
+            onClick={handleClear}
+            disabled={isLoading}
+            className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:opacity-50"
+          >
+            Clear
+          </button>
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isLoading ? 'Searching...' : 'Search'}
+          </button>
         </div>
       </form>
+
+      {/* Quick Filter Buttons */}
+      <div className="border-t pt-4 mt-4">
+        <p className="text-sm font-medium text-gray-700 mb-2">Quick Filters:</p>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              const quickFilter = { ...filters, expiryStatus: 'expired' as const };
+              setFilters(quickFilter);
+              onSearch(quickFilter);
+            }}
+            className="px-3 py-1 text-sm bg-red-100 text-red-800 rounded-full hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500"
+          >
+            Expired Items
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              const quickFilter = { ...filters, expiryStatus: 'expiring' as const };
+              setFilters(quickFilter);
+              onSearch(quickFilter);
+            }}
+            className="px-3 py-1 text-sm bg-yellow-100 text-yellow-800 rounded-full hover:bg-yellow-200 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+          >
+            Expiring Soon
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              const quickFilter = { ...filters, maxStock: 10 };
+              setFilters(quickFilter);
+              onSearch(quickFilter);
+            }}
+            className="px-3 py-1 text-sm bg-orange-100 text-orange-800 rounded-full hover:bg-orange-200 focus:outline-none focus:ring-2 focus:ring-orange-500"
+          >
+            Low Stock (&lt;10)
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              const quickFilter = { ...filters, type: MEDICINE_TYPE.TABLET };
+              setFilters(quickFilter);
+              onSearch(quickFilter);
+            }}
+            className="px-3 py-1 text-sm bg-blue-100 text-blue-800 rounded-full hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            Tablets Only
+          </button>
+        </div>
+      </div>
     </div>
   );
 };
+
+export default InventorySearch;

@@ -1,230 +1,314 @@
-// src/modules/inventory/hooks/useInventory.ts
-
 import { useState, useEffect, useCallback } from 'react';
-import type { 
-  Inventory, 
-  InventoryCreateRequest, 
-  InventoryUpdateRequest, 
-  InventorySearchFilters,
-  InventoryResponse,
-  ExpiringInventory,
-  LowStockInventory,
-  InventoryAlert,
-  InventoryStats,
-  Medicine
-} from '../types';
 import { inventoryService } from '../services/inventoryService';
+import type{ 
+  Inventory, 
+  InventoryResponse, 
+  AddInventoryRequest, 
+  UpdateInventoryRequest, 
+  UpdateStockRequest, 
+  InventorySearchRequest,
+  MedicineType,
+  InventoryFilters 
+} from '../types';
 
 export const useInventory = () => {
-  const [inventoryItems, setInventoryItems] = useState<Inventory[]>([]);
+  const [inventories, setInventories] = useState<Inventory[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [totalPages, setTotalPages] = useState(0);
-  const [totalElements, setTotalElements] = useState(0);
 
-  const fetchInventoryItems = useCallback(async (
-    page: number = 0,
-    size: number = 10,
-    filters?: InventorySearchFilters
-  ) => {
+  const handleError = (err: any) => {
+    const message = err?.message || 'An unexpected error occurred';
+    setError(message);
+    console.error('Inventory operation failed:', err);
+  };
+
+  const clearError = () => setError(null);
+
+  const fetchAllInventories = useCallback(async () => {
+    setLoading(true);
+    clearError();
     try {
-      setLoading(true);
-      setError(null);
-      const response = await inventoryService.getInventoryItems(page, size, filters);
-      setInventoryItems(response.content);
-      setTotalPages(response.totalPages);
-      setTotalElements(response.totalElements);
+      const data = await inventoryService.getAllInventory();
+      setInventories(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch inventory items');
+      handleError(err);
     } finally {
       setLoading(false);
     }
   }, []);
 
-  const createInventoryItem = useCallback(async (inventory: InventoryCreateRequest) => {
+  const addInventory = async (request: AddInventoryRequest): Promise<InventoryResponse | null> => {
+    setLoading(true);
+    clearError();
     try {
-      setLoading(true);
-      setError(null);
-      const newItem = await inventoryService.createInventory(inventory);
-      setInventoryItems(prev => [...prev, newItem]);
-      return newItem;
+      const newInventory = await inventoryService.addInventory(request);
+      await fetchAllInventories(); // Refresh the list
+      return newInventory;
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create inventory item');
-      throw err;
+      handleError(err);
+      return null;
     } finally {
       setLoading(false);
     }
-  }, []);
+  };
 
-  const updateInventoryItem = useCallback(async (inventory: InventoryUpdateRequest) => {
+  const updateInventory = async (id: number, request: UpdateInventoryRequest): Promise<Inventory | null> => {
+    setLoading(true);
+    clearError();
     try {
-      setLoading(true);
-      setError(null);
-      const updatedItem = await inventoryService.updateInventory(inventory);
-      setInventoryItems(prev => 
-        prev.map(item => 
-          item.inventoryId === updatedItem.inventoryId ? updatedItem : item
-        )
-      );
-      return updatedItem;
+      const updatedInventory = await inventoryService.updateInventory(id, request);
+      await fetchAllInventories(); // Refresh the list
+      return updatedInventory;
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update inventory item');
-      throw err;
+      handleError(err);
+      return null;
     } finally {
       setLoading(false);
     }
-  }, []);
+  };
 
-  const deleteInventoryItem = useCallback(async (id: number) => {
+  const deleteInventory = async (id: number): Promise<boolean> => {
+    setLoading(true);
+    clearError();
     try {
-      setLoading(true);
-      setError(null);
       await inventoryService.deleteInventory(id);
-      setInventoryItems(prev => prev.filter(item => item.inventoryId !== id));
+      await fetchAllInventories(); // Refresh the list
+      return true;
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete inventory item');
-      throw err;
+      handleError(err);
+      return false;
     } finally {
       setLoading(false);
     }
-  }, []);
+  };
+
+  const searchInventories = async (searchRequest: InventorySearchRequest): Promise<Inventory[]> => {
+    setLoading(true);
+    clearError();
+    try {
+      const results = await inventoryService.searchInventory(searchRequest);
+      return results;
+    } catch (err) {
+      handleError(err);
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAllInventories();
+  }, [fetchAllInventories]);
 
   return {
-    inventoryItems,
+    inventories,
     loading,
     error,
-    totalPages,
-    totalElements,
-    fetchInventoryItems,
-    createInventoryItem,
-    updateInventoryItem,
-    deleteInventoryItem,
+    clearError,
+    fetchAllInventories,
+    addInventory,
+    updateInventory,
+    deleteInventory,
+    searchInventories,
   };
 };
 
-export const useInventoryAlerts = () => {
-  const [expiringItems, setExpiringItems] = useState<ExpiringInventory[]>([]);
-  const [lowStockItems, setLowStockItems] = useState<LowStockInventory[]>([]);
-  const [alerts, setAlerts] = useState<InventoryAlert[]>([]);
+export const useInventoryStock = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchExpiringItems = useCallback(async (days: number = 30) => {
+  const handleError = (err: any) => {
+    const message = err?.message || 'An unexpected error occurred';
+    setError(message);
+    console.error('Stock operation failed:', err);
+  };
+
+  const clearError = () => setError(null);
+
+  const updateStock = async (updateRequest: UpdateStockRequest): Promise<Inventory | null> => {
+    setLoading(true);
+    clearError();
     try {
-      setLoading(true);
-      setError(null);
-      const items = await inventoryService.getExpiringInventory(days);
-      setExpiringItems(items);
+      const result = await inventoryService.updateStock(updateRequest);
+      return result;
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch expiring items');
+      handleError(err);
+      return null;
     } finally {
       setLoading(false);
     }
-  }, []);
+  };
 
-  const fetchLowStockItems = useCallback(async () => {
+  const reduceStock = async (inventoryId: number, quantity: number): Promise<Inventory | null> => {
+    setLoading(true);
+    clearError();
     try {
-      setLoading(true);
-      setError(null);
-      const items = await inventoryService.getLowStockInventory();
-      setLowStockItems(items);
+      const result = await inventoryService.reduceStock(inventoryId, quantity);
+      return result;
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch low stock items');
+      handleError(err);
+      return null;
     } finally {
       setLoading(false);
     }
-  }, []);
+  };
 
-  const fetchAlerts = useCallback(async () => {
+  const increaseStock = async (inventoryId: number, quantity: number): Promise<Inventory | null> => {
+    setLoading(true);
+    clearError();
     try {
-      setLoading(true);
-      setError(null);
-      const alertsData = await inventoryService.getInventoryAlerts();
-      setAlerts(alertsData);
+      const result = await inventoryService.increaseStock(inventoryId, quantity);
+      return result;
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch alerts');
+      handleError(err);
+      return null;
     } finally {
       setLoading(false);
     }
-  }, []);
+  };
 
-  const fetchAllAlerts = useCallback(async () => {
-    await Promise.all([
-      fetchExpiringItems(),
-      fetchLowStockItems(),
-      fetchAlerts()
-    ]);
-  }, [fetchExpiringItems, fetchLowStockItems, fetchAlerts]);
+  const checkStockAvailability = async (inventoryId: number, requiredQuantity: number): Promise<boolean | null> => {
+    setLoading(true);
+    clearError();
+    try {
+      const result = await inventoryService.checkStockAvailability(inventoryId, requiredQuantity);
+      return result;
+    } catch (err) {
+      handleError(err);
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getLowStockItems = async (threshold: number): Promise<Inventory[]> => {
+    setLoading(true);
+    clearError();
+    try {
+      const result = await inventoryService.getLowStockItems(threshold);
+      return result;
+    } catch (err) {
+      handleError(err);
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return {
-    expiringItems,
-    lowStockItems,
-    alerts,
     loading,
     error,
-    fetchExpiringItems,
-    fetchLowStockItems,
-    fetchAlerts,
-    fetchAllAlerts,
+    clearError,
+    updateStock,
+    reduceStock,
+    increaseStock,
+    checkStockAvailability,
+    getLowStockItems,
+  };
+};
+
+export const useInventoryExpiry = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleError = (err: any) => {
+    const message = err?.message || 'An unexpected error occurred';
+    setError(message);
+    console.error('Expiry operation failed:', err);
+  };
+
+  const clearError = () => setError(null);
+
+  const getExpiredItems = async (days?: number): Promise<InventoryResponse[]> => {
+    setLoading(true);
+    clearError();
+    try {
+      const result = await inventoryService.getExpiredItems(days);
+      return result;
+    } catch (err) {
+      handleError(err);
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getExpiringItems = async (days: number): Promise<InventoryResponse[]> => {
+    setLoading(true);
+    clearError();
+    try {
+      const result = await inventoryService.getExpiringItems(days);
+      return result;
+    } catch (err) {
+      handleError(err);
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return {
+    loading,
+    error,
+    clearError,
+    getExpiredItems,
+    getExpiringItems,
   };
 };
 
 export const useInventoryStats = () => {
-  const [stats, setStats] = useState<InventoryStats | null>(null);
+  const [stats, setStats] = useState<{
+    totalItems: number;
+    lowStockItems: number;
+    expiringItems: number;
+    expiredItems: number;
+    totalValue: number;
+  } | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchStats = useCallback(async () => {
+  const handleError = (err: any) => {
+    const message = err?.message || 'An unexpected error occurred';
+    setError(message);
+    console.error('Stats operation failed:', err);
+  };
+
+  const clearError = () => setError(null);
+
+  const refreshStats = useCallback(async () => {
+    setLoading(true);
+    clearError();
     try {
-      setLoading(true);
-      setError(null);
-      const statsData = await inventoryService.getInventoryStats();
-      setStats(statsData);
+      const inventories = await inventoryService.getAllInventory();
+      const lowStockItems = await inventoryService.getLowStockItems(10); // Example threshold
+      const expiringItems = await inventoryService.getExpiringItems(30); // Within 30 days
+      const expiredItems = await inventoryService.getExpiredItems();
+
+      const totalValue = inventories.reduce((sum, item) => sum + (item.availableQuantity * item.unitPrice), 0);
+
+      setStats({
+        totalItems: inventories.length,
+        lowStockItems: lowStockItems.length,
+        expiringItems: expiringItems.length,
+        expiredItems: expiredItems.length,
+        totalValue,
+      });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch inventory statistics');
+      handleError(err);
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    fetchStats();
-  }, [fetchStats]);
+    refreshStats();
+  }, [refreshStats]);
 
   return {
     stats,
     loading,
     error,
-    refreshStats: fetchStats,
-  };
-};
-
-export const useMedicines = () => {
-  const [medicines, setMedicines] = useState<Medicine[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchMedicines = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const medicinesData = await inventoryService.getMedicines();
-      setMedicines(medicinesData);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch medicines');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchMedicines();
-  }, [fetchMedicines]);
-
-  return {
-    medicines,
-    loading,
-    error,
-    refreshMedicines: fetchMedicines,
+    clearError,
+    refreshStats,
   };
 };
