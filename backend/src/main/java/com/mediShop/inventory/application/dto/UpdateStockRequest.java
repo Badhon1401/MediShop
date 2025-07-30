@@ -2,35 +2,39 @@
 // UpdateStockRequest.java
 package com.mediShop.inventory.application.dto;
 
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 
 public class UpdateStockRequest {
     @NotNull(message = "Inventory ID is required")
-    @Positive(message = "Inventory ID must be positive")
     private Integer inventoryId;
 
     @NotNull(message = "Quantity is required")
-    @Positive(message = "Quantity must be positive")
+    @Min(value = 0, message = "Quantity cannot be negative")
     private Integer quantity;
 
-    @NotNull(message = "Operation type is required")
-    private StockOperation operation;
-
+    // Constructors
     public UpdateStockRequest() {}
 
-    public UpdateStockRequest(Integer inventoryId, Integer quantity, StockOperation operation) {
+    public UpdateStockRequest(Integer inventoryId, Integer quantity) {
         this.inventoryId = inventoryId;
         this.quantity = quantity;
-        this.operation = operation;
     }
 
     // Getters and Setters
-    public Integer getInventoryId() { return inventoryId; }
-    public void setInventoryId(Integer inventoryId) { this.inventoryId = inventoryId; }
+    public Integer getInventoryId() {
+        return inventoryId;
+    }
 
-    public Integer getQuantity() { return quantity; }
-    public void setQuantity(Integer quantity) { this.quantity = quantity; }
+    public void setInventoryId(Integer inventoryId) {
+        this.inventoryId = inventoryId;
+    }
 
-    public StockOperation getOperation() { return operation; }
-    public void setOperation(StockOperation operation) { this.operation = operation; }
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
+    }
 }

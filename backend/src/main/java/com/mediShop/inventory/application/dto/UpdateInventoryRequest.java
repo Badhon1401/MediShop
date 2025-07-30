@@ -1,61 +1,167 @@
 // UpdateInventoryRequest.java
 package com.mediShop.inventory.application.dto;
 
-import jakarta.validation.constraints.*;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import com.mediShop.inventory.domain.valueobject.MedicineType;
+
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
 public class UpdateInventoryRequest {
-    @NotNull(message = "Inventory ID is required")
-    @Positive(message = "Inventory ID must be positive")
     private Integer inventoryId;
 
-    @Size(max = 100, message = "Company name must not exceed 100 characters")
+    @NotBlank(message = "Medicine name is required")
+    @Size(max = 255, message = "Medicine name cannot exceed 255 characters")
+    private String medicineName;
+
+    @NotBlank(message = "Batch number is required")
+    @Size(max = 100, message = "Batch number cannot exceed 100 characters")
+    private String batchNumber;
+
+    @NotBlank(message = "Company name is required")
+    @Size(max = 255, message = "Company name cannot exceed 255 characters")
     private String companyName;
 
-    @Future(message = "Expiry date must be in the future")
+    @NotNull(message = "Expiry date is required")
     private LocalDate expiryDate;
 
-    @Size(max = 100, message = "Location must not exceed 100 characters")
+    @Size(max = 100, message = "Location cannot exceed 100 characters")
     private String location;
 
+    @NotNull(message = "Medicine type is required")
+    private MedicineType type;
+
+    @NotNull(message = "Purchase date is required")
+    private LocalDate purchaseDate;
+
+    @NotNull(message = "Total quantity is required")
+    @Min(value = 1, message = "Total quantity must be at least 1")
+    private Integer totalQuantity;
+
+    @NotNull(message = "Available quantity is required")
+    @Min(value = 0, message = "Available quantity cannot be negative")
+    private Integer availableQuantity;
+
+    @NotNull(message = "Unit price is required")
     @DecimalMin(value = "0.0", inclusive = false, message = "Unit price must be greater than 0")
-    @Digits(integer = 10, fraction = 2, message = "Unit price must have maximum 2 decimal places")
-    private BigDecimal unitPrice;
+    private Double unitPrice;
+
+    @NotNull(message = "Purchase price is required")
+    @DecimalMin(value = "0.0", inclusive = false, message = "Purchase price must be greater than 0")
+    private Double purchasePrice;
 
     @DecimalMin(value = "0.0", message = "Discount cannot be negative")
-    @DecimalMax(value = "100.0", message = "Discount cannot exceed 100%")
-    @Digits(integer = 3, fraction = 2, message = "Discount must have maximum 2 decimal places")
-    private BigDecimal discount;
+    private Double discount;
 
+    // Constructors
     public UpdateInventoryRequest() {}
 
-    public UpdateInventoryRequest(Integer inventoryId, String companyName, LocalDate expiryDate,
-                                  String location, BigDecimal unitPrice, BigDecimal discount) {
-        this.inventoryId = inventoryId;
-        this.companyName = companyName;
-        this.expiryDate = expiryDate;
-        this.location = location;
-        this.unitPrice = unitPrice;
-        this.discount = discount;
+    // Getters and Setters
+    public Integer getInventoryId() {
+        return inventoryId;
     }
 
-    // Getters and Setters
-    public Integer getInventoryId() { return inventoryId; }
-    public void setInventoryId(Integer inventoryId) { this.inventoryId = inventoryId; }
+    public void setInventoryId(Integer inventoryId) {
+        this.inventoryId = inventoryId;
+    }
 
-    public String getCompanyName() { return companyName; }
-    public void setCompanyName(String companyName) { this.companyName = companyName; }
+    public String getMedicineName() {
+        return medicineName;
+    }
 
-    public LocalDate getExpiryDate() { return expiryDate; }
-    public void setExpiryDate(LocalDate expiryDate) { this.expiryDate = expiryDate; }
+    public void setMedicineName(String medicineName) {
+        this.medicineName = medicineName;
+    }
 
-    public String getLocation() { return location; }
-    public void setLocation(String location) { this.location = location; }
+    public String getBatchNumber() {
+        return batchNumber;
+    }
 
-    public BigDecimal getUnitPrice() { return unitPrice; }
-    public void setUnitPrice(BigDecimal unitPrice) { this.unitPrice = unitPrice; }
+    public void setBatchNumber(String batchNumber) {
+        this.batchNumber = batchNumber;
+    }
 
-    public BigDecimal getDiscount() { return discount; }
-    public void setDiscount(BigDecimal discount) { this.discount = discount; }
+    public String getCompanyName() {
+        return companyName;
+    }
+
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
+    }
+
+    public LocalDate getExpiryDate() {
+        return expiryDate;
+    }
+
+    public void setExpiryDate(LocalDate expiryDate) {
+        this.expiryDate = expiryDate;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public MedicineType getType() {
+        return type;
+    }
+
+    public void setType(MedicineType type) {
+        this.type = type;
+    }
+
+    public LocalDate getPurchaseDate() {
+        return purchaseDate;
+    }
+
+    public void setPurchaseDate(LocalDate purchaseDate) {
+        this.purchaseDate = purchaseDate;
+    }
+
+    public Integer getTotalQuantity() {
+        return totalQuantity;
+    }
+
+    public void setTotalQuantity(Integer totalQuantity) {
+        this.totalQuantity = totalQuantity;
+    }
+
+    public Integer getAvailableQuantity() {
+        return availableQuantity;
+    }
+
+    public void setAvailableQuantity(Integer availableQuantity) {
+        this.availableQuantity = availableQuantity;
+    }
+
+    public Double getUnitPrice() {
+        return unitPrice;
+    }
+
+    public void setUnitPrice(Double unitPrice) {
+        this.unitPrice = unitPrice;
+    }
+
+    public Double getPurchasePrice() {
+        return purchasePrice;
+    }
+
+    public void setPurchasePrice(Double purchasePrice) {
+        this.purchasePrice = purchasePrice;
+    }
+
+    public Double getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(Double discount) {
+        this.discount = discount;
+    }
 }

@@ -1,159 +1,246 @@
-
 // InventoryController.java
 package com.mediShop.inventory.infrastructure.web.controller;
-
-import java.util.List;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
 import com.mediShop.inventory.application.dto.AddInventoryRequest;
 import com.mediShop.inventory.application.dto.InventoryResponse;
 import com.mediShop.inventory.application.dto.InventorySearchRequest;
 import com.mediShop.inventory.application.dto.UpdateInventoryRequest;
-import com.mediShop.inventory.application.usecase.AddInventoryUseCase;
-import com.mediShop.inventory.application.usecase.DeleteInventoryUseCase;
-import com.mediShop.inventory.application.usecase.GetExpiredInventoryUseCase;
-import com.mediShop.inventory.application.usecase.GetInventoryUseCase;
-import com.mediShop.inventory.application.usecase.GetLowStockInventoryUseCase;
-import com.mediShop.inventory.application.usecase.SearchInventoryUseCase;
-import com.mediShop.inventory.application.usecase.UpdateInventoryUseCase;
-import com.mediShop.medicine.domain.valueobject.MedicineType;
+import com.mediShop.inventory.application.dto.UpdateStockRequest;
+import com.mediShop.inventory.application.usecase.*;
+import com.mediShop.inventory.domain.entity.Inventory;
+import com.mediShop.inventory.domain.valueobject.MedicineType;
+import com.mediShop.inventory.infrastructure.web.exception.InventoryNotFoundException;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/inventory")
-@CrossOrigin(origins = "*")
+//@CrossOrigin(origins = "http://localhost:3000")
+//@CrossOrigin(origins = {"*","http://localhost:3000"})
+@Validated
+@CrossOrigin(origins = "*", maxAge = 3600)
 public class InventoryController {
 
     private final AddInventoryUseCase addInventoryUseCase;
-    private final UpdateInventoryUseCase updateInventoryUseCase;
     private final GetInventoryUseCase getInventoryUseCase;
-    private final SearchInventoryUseCase searchInventoryUseCase;
-    private final GetExpiredInventoryUseCase GetExpiredInventoryUseCase;
-    private final GetLowStockInventoryUseCase getLowStockInventoryUseCase;
+    private final UpdateInventoryUseCase updateInventoryUseCase;
     private final DeleteInventoryUseCase deleteInventoryUseCase;
-    // private final GetInventoryStatsUseCase getInventoryStatsUseCase;
+    private final SearchInventoryUseCase searchInventoryUseCase;
+    private final GetLowStockInventoryUseCase getLowStockInventoryUseCase;
+    private final GetExpiredInventoryUseCase getExpiredInventoryUseCase;
+    private final UpdateStockUseCase updateStockUseCase;
 
-    public InventoryController(AddInventoryUseCase addInventoryUseCase,
-                              UpdateInventoryUseCase updateInventoryUseCase,
-                              GetInventoryUseCase getInventoryUseCase,
-                              SearchInventoryUseCase searchInventoryUseCase,
-                              GetExpiredInventoryUseCase GetExpiredInventoryUseCase,
-                              GetLowStockInventoryUseCase getLowStockInventoryUseCase,
-                              DeleteInventoryUseCase deleteInventoryUseCase) {
+    @Autowired
+    public InventoryController(
+            AddInventoryUseCase addInventoryUseCase,
+            GetInventoryUseCase getInventoryUseCase,
+            UpdateInventoryUseCase updateInventoryUseCase,
+            DeleteInventoryUseCase deleteInventoryUseCase,
+            SearchInventoryUseCase searchInventoryUseCase,
+            GetLowStockInventoryUseCase getLowStockInventoryUseCase,
+            GetExpiredInventoryUseCase getExpiredInventoryUseCase,
+            UpdateStockUseCase updateStockUseCase) {
         this.addInventoryUseCase = addInventoryUseCase;
-        this.updateInventoryUseCase = updateInventoryUseCase;
         this.getInventoryUseCase = getInventoryUseCase;
-        this.searchInventoryUseCase = searchInventoryUseCase;
-        this.GetExpiredInventoryUseCase = GetExpiredInventoryUseCase;
-        this.getLowStockInventoryUseCase = getLowStockInventoryUseCase;
+        this.updateInventoryUseCase = updateInventoryUseCase;
         this.deleteInventoryUseCase = deleteInventoryUseCase;
-        // this.getInventoryStatsUseCase = getInventoryStatsUseCase;
+        this.searchInventoryUseCase = searchInventoryUseCase;
+        this.getLowStockInventoryUseCase = getLowStockInventoryUseCase;
+        this.getExpiredInventoryUseCase = getExpiredInventoryUseCase;
+        this.updateStockUseCase = updateStockUseCase;
     }
 
+    // Basic CRUD Operations
     @PostMapping
     public ResponseEntity<InventoryResponse> addInventory(@Valid @RequestBody AddInventoryRequest request) {
-        System.out.println("----------------------------------InventoryController.addInventory: ----------------------------------- "+request);
-        InventoryResponse response = addInventoryUseCase.execute(request);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<InventoryResponse> updateInventory(@PathVariable Integer id,
-                                                           @Valid @RequestBody UpdateInventoryRequest request) {
-        System.out.println("----------------------------------InventoryController.updateInventory: ----------------------------------- ");
-
-        request.setInventoryId(id);
-        InventoryResponse response = updateInventoryUseCase.execute(request);
-        return ResponseEntity.ok(response);
+        InventoryResponse savedInventory = addInventoryUseCase.execute(request);
+        return new ResponseEntity<>(savedInventory, HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<InventoryResponse> getInventory(@PathVariable Integer id) {
-        InventoryResponse response = getInventoryUseCase.execute(id);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<Inventory> getInventoryById(@PathVariable("id") Integer inventoryId) {
+        Optional<Inventory> inventory = getInventoryUseCase.getInventoryById(inventoryId);
+        return inventory.map(inv -> ResponseEntity.ok(inv))
+                .orElseThrow(() -> new InventoryNotFoundException("Inventory not found with ID: " + inventoryId));
     }
-
-    //  @GetMapping
-    //  public ResponseEntity<List<InventoryResponse>> getAllInventory() {
-    //      System.out.println("----------------------------------InventoryController.getAllInventory: ----------------------------------- ");
-    //     InventorySearchRequest request = new InventorySearchRequest();
-    //     List<InventoryResponse> response = InventorySearchRequest.execute(request);
-    //  return ResponseEntity.ok(response);
-    //  }
 
     @GetMapping
-     public ResponseEntity<List<InventoryResponse>> getAllInventory() {
-         System.out.println("----------------------------------InventoryController.getAllInventory: ----------------------------------- ");
-        InventorySearchRequest request = new InventorySearchRequest();
-        List<InventoryResponse> response = searchInventoryUseCase.execute(request);
-     return ResponseEntity.ok(response);
-     }
-
-
-
-@GetMapping("/search")
-public ResponseEntity<List<InventoryResponse>> searchInventory(
-        @RequestParam(required = false) String name,
-        @RequestParam(required = false) String type,
-        @RequestParam(required = false) String category,
-        @RequestParam(required = false) String batchNumber) {
-
-    InventorySearchRequest request = new InventorySearchRequest();
-    request.setMedicineName(name);
-    if (type != null) {
-        request.setType(MedicineType.valueOf(type.toUpperCase()));
-    }
-    request.setBatchNumber(batchNumber);
-
-    List<InventoryResponse> response = searchInventoryUseCase.execute(request);
-    return ResponseEntity.ok(response);
-}
-
-    @GetMapping("/expired")
-    public ResponseEntity<List<InventoryResponse>> getExpiredInventory() {
-        System.out.println("----------------------------------InventoryController.getExpiredInventory: ----------------------------------- ");
-        List<InventoryResponse> response = this.GetExpiredInventoryUseCase.execute(null);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<List<Inventory>> getAllInventory() {
+        List<Inventory> inventoryList = getInventoryUseCase.getAllInventory();
+        return ResponseEntity.ok(inventoryList);
     }
 
-    @GetMapping("/low-stock")
-        public ResponseEntity<List<InventoryResponse>> getLowStockInventory(
-            @RequestParam(defaultValue = "10") Integer threshold) {
-        List<InventoryResponse> response = getLowStockInventoryUseCase.execute(threshold);
-    return ResponseEntity.ok(response);
-}
-
-
-    // @GetMapping("/medicine/{medicineId}")
-    // public ResponseEntity<List<InventoryResponse>> getInventoryByMedicine(@PathVariable Integer medicineId) {
-    //     InventorySearchRequest request = new InventorySearchRequest();
-    //     request.setMedicineId(medicineId);
-    //     List<InventoryResponse> response = searchInventoryUseCase.execute(request);
-    //     return ResponseEntity.ok(response);
-    // }
-
-    // @GetMapping("/stats")
-    // public ResponseEntity<InventoryStatsResponse> getInventoryStats() {
-    //     InventoryStatsResponse response = getInventoryStatsUseCase.execute(null);
-    //     return ResponseEntity.ok(response);
-    // }
+    @PutMapping("/{id}")
+    public ResponseEntity<Inventory> updateInventory(
+            @PathVariable("id") Integer inventoryId,
+            @Valid @RequestBody UpdateInventoryRequest updateRequest) {
+        updateRequest.setInventoryId(inventoryId);
+        Optional<Inventory> updatedInventory = updateInventoryUseCase.updateInventory(updateRequest);
+        return updatedInventory.map(inv -> ResponseEntity.ok(inv))
+                .orElseThrow(() -> new InventoryNotFoundException("Inventory not found with ID: " + inventoryId));
+    }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteInventory(@PathVariable Integer id) {
-        deleteInventoryUseCase.execute(id);
+    public ResponseEntity<Void> deleteInventory(@PathVariable("id") Integer inventoryId) {
+        deleteInventoryUseCase.execute(inventoryId);
         return ResponseEntity.noContent().build();
+    }
+
+    // Search Operations
+    @PostMapping("/search")
+    public ResponseEntity<List<Inventory>> searchInventory(@RequestBody InventorySearchRequest searchRequest) {
+        List<Inventory> results = searchInventoryUseCase.searchInventory(searchRequest);
+        return ResponseEntity.ok(results);
+    }
+
+    @GetMapping("/search/medicine")
+    public ResponseEntity<List<Inventory>> searchByMedicineName(@RequestParam String medicineName) {
+        List<Inventory> results = searchInventoryUseCase.findByMedicineName(medicineName);
+        return ResponseEntity.ok(results);
+    }
+
+    @GetMapping("/search/batch")
+    public ResponseEntity<List<Inventory>> searchByBatchNumber(@RequestParam String batchNumber) {
+        List<Inventory> results = searchInventoryUseCase.findByBatchNumber(batchNumber);
+        return ResponseEntity.ok(results);
+    }
+
+    @GetMapping("/search/company")
+    public ResponseEntity<List<Inventory>> searchByCompanyName(@RequestParam String companyName) {
+        List<Inventory> results = searchInventoryUseCase.findByCompanyName(companyName);
+        return ResponseEntity.ok(results);
+    }
+
+    @GetMapping("/search/type")
+    public ResponseEntity<List<Inventory>> searchByMedicineType(@RequestParam MedicineType type) {
+        List<Inventory> results = searchInventoryUseCase.findByMedicineType(type);
+        return ResponseEntity.ok(results);
+    }
+
+    @GetMapping("/search/location")
+    public ResponseEntity<List<Inventory>> searchByLocation(@RequestParam String location) {
+        List<Inventory> results = searchInventoryUseCase.findByLocation(location);
+        return ResponseEntity.ok(results);
+    }
+
+    // Stock Management Operations
+    @PutMapping("/stock")
+    public ResponseEntity<Inventory> updateStock(@Valid @RequestBody UpdateStockRequest updateRequest) {
+        Optional<Inventory> updatedInventory = updateStockUseCase.updateAvailableStock(updateRequest);
+        return updatedInventory.map(inv -> ResponseEntity.ok(inv))
+                .orElseThrow(() -> new InventoryNotFoundException("Inventory not found with ID: " + updateRequest.getInventoryId()));
+    }
+
+    @PutMapping("/stock/{id}/reduce")
+    public ResponseEntity<Inventory> reduceStock(
+            @PathVariable("id") Integer inventoryId,
+            @RequestParam @NotNull @Min(1) Integer quantity) {
+        Optional<Inventory> updatedInventory = updateStockUseCase.reduceStock(inventoryId, quantity);
+        return updatedInventory.map(inv -> ResponseEntity.ok(inv))
+                .orElseThrow(() -> new InventoryNotFoundException("Inventory not found with ID: " + inventoryId));
+    }
+
+    @PutMapping("/stock/{id}/increase")
+    public ResponseEntity<Inventory> increaseStock(
+            @PathVariable("id") Integer inventoryId,
+            @RequestParam @NotNull @Min(1) Integer quantity) {
+        Optional<Inventory> updatedInventory = updateStockUseCase.increaseStock(inventoryId, quantity);
+        return updatedInventory.map(inv -> ResponseEntity.ok(inv))
+                .orElseThrow(() -> new InventoryNotFoundException("Inventory not found with ID: " + inventoryId));
+    }
+
+    @GetMapping("/stock/{id}/available")
+    public ResponseEntity<Boolean> checkStockAvailability(
+            @PathVariable("id") Integer inventoryId,
+            @RequestParam @NotNull @Min(1) Integer requiredQuantity) {
+        boolean isAvailable = updateStockUseCase.hasAvailableStock(inventoryId, requiredQuantity);
+        return ResponseEntity.ok(isAvailable);
+    }
+
+    // Low Stock Operations
+    @GetMapping("/low-stock")
+    public ResponseEntity<List<Inventory>> getLowStockItems(@RequestParam @NotNull @Min(0) Integer threshold) {
+        List<Inventory> lowStockItems = getLowStockInventoryUseCase.getLowStockItems(threshold);
+        return ResponseEntity.ok(lowStockItems);
+    }
+
+    @GetMapping("/stock/above")
+    public ResponseEntity<List<Inventory>> getItemsWithStockAbove(@RequestParam @NotNull @Min(0) Integer quantity) {
+        List<Inventory> results = getLowStockInventoryUseCase.getItemsWithStockGreaterThan(quantity);
+        return ResponseEntity.ok(results);
+    }
+
+    @GetMapping("/stock/range")
+    public ResponseEntity<List<Inventory>> getItemsByStockRange(
+            @RequestParam @NotNull @Min(0) Integer minQuantity,
+            @RequestParam @NotNull @Min(0) Integer maxQuantity) {
+        List<Inventory> results = getLowStockInventoryUseCase.getItemsByStockRange(minQuantity, maxQuantity);
+        return ResponseEntity.ok(results);
+    }
+
+    // Expiry Operations
+    @GetMapping("/expired")
+    public ResponseEntity<List<InventoryResponse>> getExpiredItems(@RequestParam(required = false) Integer days) {
+        List<InventoryResponse> expiredItems = getExpiredInventoryUseCase.execute(days);
+        return ResponseEntity.ok(expiredItems);
+    }
+
+    @GetMapping("/expiring")
+    public ResponseEntity<List<InventoryResponse>> getExpiringItems(@RequestParam @NotNull @Min(1) Integer days) {
+        List<InventoryResponse> expiringItems = getExpiredInventoryUseCase.execute(days);
+        return ResponseEntity.ok(expiringItems);
+    }
+
+    // Remove this method since GetExpiredInventoryUseCase doesn't have getItemsExpiringBefore method
+    // Based on your implementation, expiry filtering should use the execute method with days parameter
+    @GetMapping("/expiry/range")
+    public ResponseEntity<List<Inventory>> getItemsByExpiryRange(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        List<Inventory> results = searchInventoryUseCase.findByExpiryDateRange(startDate, endDate);
+        return ResponseEntity.ok(results);
+    }
+
+    // Purchase Date and Price Operations
+    @GetMapping("/purchase/date-range")
+    public ResponseEntity<List<Inventory>> getItemsByPurchaseDateRange(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        List<Inventory> results = searchInventoryUseCase.findByPurchaseDateRange(startDate, endDate);
+        return ResponseEntity.ok(results);
+    }
+
+    @GetMapping("/purchase/price-range")
+    public ResponseEntity<List<Inventory>> getItemsByPurchasePriceRange(
+            @RequestParam @NotNull @Min(0) Double minPrice,
+            @RequestParam @NotNull @Min(0) Double maxPrice) {
+        List<Inventory> results = searchInventoryUseCase.findByPurchasePriceRange(minPrice, maxPrice);
+        return ResponseEntity.ok(results);
+    }
+
+    @GetMapping("/unit/price-range")
+    public ResponseEntity<List<Inventory>> getItemsByUnitPriceRange(
+            @RequestParam @NotNull @Min(0) Double minPrice,
+            @RequestParam @NotNull @Min(0) Double maxPrice) {
+        List<Inventory> results = searchInventoryUseCase.findByUnitPriceRange(minPrice, maxPrice);
+        return ResponseEntity.ok(results);
+    }
+
+    // Health Check
+    @GetMapping("/health")
+    public ResponseEntity<String> healthCheck() {
+        return ResponseEntity.ok("Inventory service is running");
     }
 }

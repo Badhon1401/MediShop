@@ -1,32 +1,32 @@
-
 // GetLowStockInventoryUseCase.java
 package com.mediShop.inventory.application.usecase;
 
 import com.mediShop.inventory.domain.entity.Inventory;
 import com.mediShop.inventory.domain.repository.InventoryRepository;
-import com.mediShop.inventory.application.dto.InventoryResponse;
-
-import java.time.LocalDate;
-import java.util.List;
-import java.util.stream.Collectors;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-@Service
-public class GetLowStockInventoryUseCase implements UseCase<Integer, List<InventoryResponse>> {
-    private final InventoryRepository inventoryRepository;
+import java.util.List;
 
+@Service
+public class GetLowStockInventoryUseCase {
+    
+    private final InventoryRepository inventoryRepository;
+    
+    @Autowired
     public GetLowStockInventoryUseCase(InventoryRepository inventoryRepository) {
         this.inventoryRepository = inventoryRepository;
     }
-
-    @Override
-    public List<InventoryResponse> execute(Integer threshold) {
-        LocalDate thresholdDate = LocalDate.now().plusDays(threshold);
-        List<Inventory> lowStockInventories = inventoryRepository.findLowStockInventory(threshold);
-
-        return lowStockInventories.stream()
-                .map(InventoryResponse::from)
-                .collect(Collectors.toList());
+    
+    public List<Inventory> getLowStockItems(Integer threshold) {
+        return inventoryRepository.findByAvailableQuantityLessThanEqual(threshold);
+    }
+    
+    public List<Inventory> getItemsWithStockGreaterThan(Integer quantity) {
+        return inventoryRepository.findByAvailableQuantityGreaterThan(quantity);
+    }
+    
+    public List<Inventory> getItemsByStockRange(Integer minQuantity, Integer maxQuantity) {
+        return inventoryRepository.findByTotalQuantityBetween(minQuantity, maxQuantity);
     }
 }

@@ -1,67 +1,84 @@
+
 // InventorySearchRequest.java
 package com.mediShop.inventory.application.dto;
 
-import com.mediShop.medicine.domain.valueobject.MedicineType;
-import java.time.LocalDate;
+import com.mediShop.inventory.domain.valueobject.MedicineType;
 
 public class InventorySearchRequest {
     private String medicineName;
     private String batchNumber;
     private String companyName;
     private MedicineType type;
-    private Integer supplierId;
     private String location;
-    private Boolean expired;
-    private Boolean lowStock;
-    private LocalDate expiryDateFrom;
-    private LocalDate expiryDateTo;
-    private Integer page = 0;
-    private Integer size = 20;
-    private String sortBy = "lastUpdated";
-    private String sortDirection = "DESC";
+    private Boolean isExpired;
+    private Boolean isLowStock;
+    private Integer stockThreshold;
 
+    // Constructors
     public InventorySearchRequest() {}
 
     // Getters and Setters
-    public String getMedicineName() { return medicineName; }
-    public void setMedicineName(String medicineName) { this.medicineName = medicineName; }
+    public String getMedicineName() {
+        return medicineName;
+    }
 
-    public String getBatchNumber() { return batchNumber; }
-    public void setBatchNumber(String batchNumber) { this.batchNumber = batchNumber; }
+    public void setMedicineName(String medicineName) {
+        this.medicineName = medicineName;
+    }
 
-    public String getCompanyName() { return companyName; }
-    public void setCompanyName(String companyName) { this.companyName = companyName; }
+    public String getBatchNumber() {
+        return batchNumber;
+    }
 
-    public MedicineType getType() { return type; }
-    public void setType(MedicineType type) { this.type = type; }
+    public void setBatchNumber(String batchNumber) {
+        this.batchNumber = batchNumber;
+    }
 
-    public Integer getSupplierId() { return supplierId; }
-    public void setSupplierId(Integer supplierId) { this.supplierId = supplierId; }
+    public String getCompanyName() {
+        return companyName;
+    }
 
-    public String getLocation() { return location; }
-    public void setLocation(String location) { this.location = location; }
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
+    }
 
-    public Boolean getExpired() { return expired; }
-    public void setExpired(Boolean expired) { this.expired = expired; }
+    public MedicineType getType() {
+        return type;
+    }
 
-    public Boolean getLowStock() { return lowStock; }
-    public void setLowStock(Boolean lowStock) { this.lowStock = lowStock; }
+    public void setType(MedicineType type) {
+        this.type = type;
+    }
 
-    public LocalDate getExpiryDateFrom() { return expiryDateFrom; }
-    public void setExpiryDateFrom(LocalDate expiryDateFrom) { this.expiryDateFrom = expiryDateFrom; }
+    public String getLocation() {
+        return location;
+    }
 
-    public LocalDate getExpiryDateTo() { return expiryDateTo; }
-    public void setExpiryDateTo(LocalDate expiryDateTo) { this.expiryDateTo = expiryDateTo; }
+    public void setLocation(String location) {
+        this.location = location;
+    }
 
-    public Integer getPage() { return page; }
-    public void setPage(Integer page) { this.page = page; }
+    public Boolean getIsExpired() {
+        return isExpired;
+    }
 
-    public Integer getSize() { return size; }
-    public void setSize(Integer size) { this.size = size; }
+    public void setIsExpired(Boolean isExpired) {
+        this.isExpired = isExpired;
+    }
 
-    public String getSortBy() { return sortBy; }
-    public void setSortBy(String sortBy) { this.sortBy = sortBy; }
+    public Boolean getIsLowStock() {
+        return isLowStock;
+    }
 
-    public String getSortDirection() { return sortDirection; }
-    public void setSortDirection(String sortDirection) { this.sortDirection = sortDirection; }
+    public void setIsLowStock(Boolean isLowStock) {
+        this.isLowStock = isLowStock;
+    }
+
+    public Integer getStockThreshold() {
+        return stockThreshold;
+    }
+
+    public void setStockThreshold(Integer stockThreshold) {
+        this.stockThreshold = stockThreshold;
+    }
 }

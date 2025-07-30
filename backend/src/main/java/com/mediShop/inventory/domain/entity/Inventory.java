@@ -1,247 +1,235 @@
-// com/mediShop/inventory/domain/entity/Inventory.java
 package com.mediShop.inventory.domain.entity;
 
-import java.math.BigDecimal;
+import com.mediShop.inventory.domain.valueobject.MedicineType;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import com.mediShop.medicine.domain.valueobject.MedicineType;
 
 public class Inventory {
-    private final Integer inventoryId;
-    private Integer medicineId;
+    private Integer inventoryId;
     private String medicineName;
-    private MedicineType type;
     private String batchNumber;
     private String companyName;
     private LocalDate expiryDate;
     private String location;
     private LocalDateTime lastUpdated;
-    private Integer supplierId;
-    private LocalDate buyingDate;
+    private MedicineType type;
+    private LocalDate purchaseDate;
     private Integer totalQuantity;
     private Integer availableQuantity;
-    private BigDecimal unitPrice;
-    private BigDecimal buyingPrice;
-    private BigDecimal discount;
+    private Double unitPrice;
+    private Double purchasePrice;
+    private Double discount;
 
-    public Inventory(Integer inventoryId, Integer medicineId, String batchNumber,
-                     String companyName, LocalDate expiryDate, String location,
-                     MedicineType type, Integer supplierId, LocalDate buyingDate,
-                     Integer totalQuantity, Integer availableQuantity,
-                     BigDecimal unitPrice, BigDecimal buyingPrice, BigDecimal discount) {
-        this.inventoryId = inventoryId;
-        this.medicineId = validateMedicineId(medicineId);
-        this.batchNumber = validateBatchNumber(batchNumber);
-        this.companyName = validateCompanyName(companyName);
-        this.expiryDate = validateExpiryDate(expiryDate);
-        this.location = validateLocation(location);
+    // Default constructor
+    public Inventory() {}
+
+    // Constructor without ID (for creation)
+    public Inventory(String medicineName, String batchNumber, String companyName,
+                    LocalDate expiryDate, String location, MedicineType type,
+                    LocalDate purchaseDate, Integer totalQuantity, Integer availableQuantity,
+                    Double unitPrice, Double purchasePrice, Double discount) {
+        this.medicineName = medicineName;
+        this.batchNumber = batchNumber;
+        this.companyName = companyName;
+        this.expiryDate = expiryDate;
+        this.location = location;
         this.type = type;
-        this.supplierId = supplierId;
-        this.buyingDate = validateBuyingDate(buyingDate);
-        this.totalQuantity = validateTotalQuantity(totalQuantity);
-        this.availableQuantity = validateAvailableQuantity(availableQuantity, totalQuantity);
-        this.unitPrice = validateUnitPrice(unitPrice);
-        this.buyingPrice = validateBuyingPrice(buyingPrice);
-        this.discount = validateDiscount(discount);
+        this.purchaseDate = purchaseDate;
+        this.totalQuantity = totalQuantity;
+        this.availableQuantity = availableQuantity;
+        this.unitPrice = unitPrice;
+        this.purchasePrice = purchasePrice;
+        this.discount = discount;
         this.lastUpdated = LocalDateTime.now();
     }
 
-    public static Inventory create(Integer medicineId, String batchNumber,
-                                   String companyName, LocalDate expiryDate,
-                                   String location, MedicineType type,
-                                   Integer supplierId, LocalDate buyingDate,
-                                   Integer totalQuantity, BigDecimal unitPrice,
-                                   BigDecimal buyingPrice, BigDecimal discount) {
-        return new Inventory(null, medicineId, batchNumber, companyName,
-                expiryDate, location, type, supplierId, buyingDate,
-                totalQuantity, totalQuantity, unitPrice, buyingPrice, discount);
+    // Full constructor
+    public Inventory(Integer inventoryId, String medicineName, String batchNumber,
+                    String companyName, LocalDate expiryDate, String location,
+                    LocalDateTime lastUpdated, MedicineType type, LocalDate purchaseDate,
+                    Integer totalQuantity, Integer availableQuantity, Double unitPrice,
+                    Double purchasePrice, Double discount) {
+        this.inventoryId = inventoryId;
+        this.medicineName = medicineName;
+        this.batchNumber = batchNumber;
+        this.companyName = companyName;
+        this.expiryDate = expiryDate;
+        this.location = location;
+        this.lastUpdated = lastUpdated;
+        this.type = type;
+        this.purchaseDate = purchaseDate;
+        this.totalQuantity = totalQuantity;
+        this.availableQuantity = availableQuantity;
+        this.unitPrice = unitPrice;
+        this.purchasePrice = purchasePrice;
+        this.discount = discount;
     }
 
-    private Integer validateMedicineId(Integer medicineId) {
-        if (medicineId == null || medicineId <= 0) {
-            throw new IllegalArgumentException("Medicine ID must be positive");
+    // Business methods
+    public void updateStock(Integer newAvailableQuantity) {
+        if (newAvailableQuantity < 0) {
+            throw new IllegalArgumentException("Available quantity cannot be negative");
         }
-        return medicineId;
-    }
-
-    private String validateBatchNumber(String batchNumber) {
-        if (batchNumber == null || batchNumber.trim().isEmpty()) {
-            throw new IllegalArgumentException("Batch number cannot be empty");
-        }
-        return batchNumber.trim();
-    }
-
-    private String validateCompanyName(String companyName) {
-        if (companyName == null || companyName.trim().isEmpty()) {
-            throw new IllegalArgumentException("Company name cannot be empty");
-        }
-        return companyName.trim();
-    }
-
-    private LocalDate validateExpiryDate(LocalDate expiryDate) {
-        if (expiryDate == null) {
-            throw new IllegalArgumentException("Expiry date cannot be null");
-        }
-        // Removed validation for past expiry dates to allow retrieval of expired inventory
-        return expiryDate;
-    }
-
-    private String validateLocation(String location) {
-        if (location == null || location.trim().isEmpty()) {
-            throw new IllegalArgumentException("Location cannot be empty");
-        }
-        return location.trim();
-    }
-
-    private LocalDate validateBuyingDate(LocalDate buyingDate) {
-        if (buyingDate == null) {
-            throw new IllegalArgumentException("Buying date cannot be null");
-        }
-        if (buyingDate.isAfter(LocalDate.now())) {
-            throw new IllegalArgumentException("Buying date cannot be in the future");
-        }
-        return buyingDate;
-    }
-
-    private Integer validateTotalQuantity(Integer totalQuantity) {
-        if (totalQuantity == null || totalQuantity < 0) {
-            throw new IllegalArgumentException("Total quantity must be non-negative");
-        }
-        return totalQuantity;
-    }
-
-    private Integer validateAvailableQuantity(Integer availableQuantity, Integer totalQuantity) {
-        if (availableQuantity == null || availableQuantity < 0) {
-            throw new IllegalArgumentException("Available quantity must be non-negative");
-        }
-        if (totalQuantity != null && availableQuantity > totalQuantity) {
+        if (newAvailableQuantity > this.totalQuantity) {
             throw new IllegalArgumentException("Available quantity cannot exceed total quantity");
         }
-        return availableQuantity;
-    }
-
-    private BigDecimal validateUnitPrice(BigDecimal unitPrice) {
-        if (unitPrice == null || unitPrice.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("Unit price must be non-negative");
-        }
-        return unitPrice;
-    }
-
-    private BigDecimal validateBuyingPrice(BigDecimal buyingPrice) {
-        if (buyingPrice == null || buyingPrice.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("Buying price must be non-negative");
-        }
-        return buyingPrice;
-    }
-
-    private BigDecimal validateDiscount(BigDecimal discount) {
-        if (discount == null) {
-            return BigDecimal.ZERO;
-        }
-        if (discount.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("Discount must be non-negative");
-        }
-        return discount;
-    }
-
-    public boolean isExpired() {
-        return LocalDate.now().isAfter(expiryDate);
-    }
-
-    public boolean isNearExpiry(int daysThreshold) {
-        return LocalDate.now().plusDays(daysThreshold).isAfter(expiryDate) ||
-                LocalDate.now().plusDays(daysThreshold).isEqual(expiryDate);
-    }
-
-    public boolean isLowStock(int threshold) {
-        return availableQuantity <= threshold;
-    }
-
-    public boolean isOutOfStock() {
-        return availableQuantity == 0;
-    }
-
-    public void updateStock(Integer newAvailableQuantity) {
-        this.availableQuantity = validateAvailableQuantity(newAvailableQuantity, totalQuantity);
+        this.availableQuantity = newAvailableQuantity;
         this.lastUpdated = LocalDateTime.now();
     }
 
-    public void updatePricing(BigDecimal unitPrice, BigDecimal discount) {
-        this.unitPrice = validateUnitPrice(unitPrice);
-        this.discount = validateDiscount(discount);
-        this.lastUpdated = LocalDateTime.now();
-    }
-
-    public void updateLocation(String location) {
-        this.location = validateLocation(location);
-        this.lastUpdated = LocalDateTime.now();
-    }
-
-    public BigDecimal getEffectivePrice() {
-        return unitPrice.subtract(discount);
-    }
-
-    public BigDecimal getTotalValue() {
-        return getEffectivePrice().multiply(BigDecimal.valueOf(availableQuantity));
-    }
-
-    public Integer getUsedQuantity() {
-        return totalQuantity - availableQuantity;
-    }
-
-    // Getters
-    public Integer getInventoryId() { return inventoryId; }
-    public Integer getMedicineId() { return medicineId; }
-    public String getBatchNumber() { return batchNumber; }
-    public String getCompanyName() { return companyName; }
-    public LocalDate getExpiryDate() { return expiryDate; }
-    public String getLocation() { return location; }
-    public LocalDateTime getLastUpdated() { return lastUpdated; }
-    public MedicineType getType() { return type; }
-    public Integer getSupplierId() { return supplierId; }
-    public LocalDate getBuyingDate() { return buyingDate; }
-    public Integer getTotalQuantity() { return totalQuantity; }
-    public Integer getAvailableQuantity() { return availableQuantity; }
-    public BigDecimal getUnitPrice() { return unitPrice; }
-    public BigDecimal getBuyingPrice() { return buyingPrice; }
-    public BigDecimal getDiscount() { return discount; }
-
-    public void updateDetails(String companyName2, LocalDate expiryDate2, String location2, BigDecimal unitPrice2,
-            BigDecimal discount2) {
-        this.companyName = validateCompanyName(companyName2);
-        this.expiryDate = validateExpiryDate(expiryDate2);
-        this.location = validateLocation(location2);
-        this.unitPrice = validateUnitPrice(unitPrice2);
-        this.discount = validateDiscount(discount2);
-        this.lastUpdated = LocalDateTime.now();
-    }
-
-    public void addStock(Integer quantity) {
-        if (quantity == null || quantity <= 0) {
-            throw new IllegalArgumentException("Quantity to add must be positive");
+    public void reduceStock(Integer quantity) {
+        if (quantity <= 0) {
+            throw new IllegalArgumentException("Quantity to reduce must be positive");
         }
-        this.totalQuantity += quantity;
-        this.availableQuantity += quantity;
-        this.lastUpdated = LocalDateTime.now();
-    }
-
-    public void removeStock(Integer quantity) {
-        if (quantity == null || quantity <= 0) {
-            throw new IllegalArgumentException("Quantity to remove must be positive");
-        }
-        if (quantity > availableQuantity) {
-            throw new IllegalArgumentException("Cannot remove more than available quantity");
+        if (this.availableQuantity < quantity) {
+            throw new IllegalArgumentException("Insufficient stock available");
         }
         this.availableQuantity -= quantity;
         this.lastUpdated = LocalDateTime.now();
     }
 
-    public void setAvailableQuantity(Integer quantity) {
-        this.availableQuantity = validateAvailableQuantity(quantity, totalQuantity);
+    public void addStock(Integer quantity) {
+        if (quantity <= 0) {
+            throw new IllegalArgumentException("Quantity to add must be positive");
+        }
+        this.availableQuantity += quantity;
+        this.totalQuantity += quantity;
         this.lastUpdated = LocalDateTime.now();
+    }
+
+    public boolean isExpired() {
+        return this.expiryDate.isBefore(LocalDate.now());
+    }
+
+    public boolean isExpiringSoon(int days) {
+        return this.expiryDate.isBefore(LocalDate.now().plusDays(days));
+    }
+
+    public boolean isLowStock(Integer threshold) {
+        return this.availableQuantity <= threshold;
+    }
+
+    public Double calculateStockValue() {
+        return this.availableQuantity * this.unitPrice;
+    }
+
+    public Double calculateProfit() {
+        if (this.purchasePrice == null || this.unitPrice == null) {
+            return 0.0;
+        }
+        return (this.unitPrice - this.purchasePrice) * (this.totalQuantity - this.availableQuantity);
+    }
+
+    // Getters and Setters
+    public Integer getInventoryId() {
+        return inventoryId;
+    }
+
+    public void setInventoryId(Integer inventoryId) {
+        this.inventoryId = inventoryId;
     }
 
     public String getMedicineName() {
         return medicineName;
+    }
+
+    public void setMedicineName(String medicineName) {
+        this.medicineName = medicineName;
+    }
+
+    public String getBatchNumber() {
+        return batchNumber;
+    }
+
+    public void setBatchNumber(String batchNumber) {
+        this.batchNumber = batchNumber;
+    }
+
+    public String getCompanyName() {
+        return companyName;
+    }
+
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
+    }
+
+    public LocalDate getExpiryDate() {
+        return expiryDate;
+    }
+
+    public void setExpiryDate(LocalDate expiryDate) {
+        this.expiryDate = expiryDate;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public LocalDateTime getLastUpdated() {
+        return lastUpdated;
+    }
+
+    public void setLastUpdated(LocalDateTime lastUpdated) {
+        this.lastUpdated = lastUpdated;
+    }
+
+    public MedicineType getType() {
+        return type;
+    }
+
+    public void setType(MedicineType type) {
+        this.type = type;
+    }
+
+    public LocalDate getPurchaseDate() {
+        return purchaseDate;
+    }
+
+    public void setPurchaseDate(LocalDate purchaseDate) {
+        this.purchaseDate = purchaseDate;
+    }
+
+    public Integer getTotalQuantity() {
+        return totalQuantity;
+    }
+
+    public void setTotalQuantity(Integer totalQuantity) {
+        this.totalQuantity = totalQuantity;
+    }
+
+    public Integer getAvailableQuantity() {
+        return availableQuantity;
+    }
+
+    public void setAvailableQuantity(Integer availableQuantity) {
+        this.availableQuantity = availableQuantity;
+    }
+
+    public Double getUnitPrice() {
+        return unitPrice;
+    }
+
+    public void setUnitPrice(Double unitPrice) {
+        this.unitPrice = unitPrice;
+    }
+
+    public Double getPurchasePrice() {
+        return purchasePrice;
+    }
+
+    public void setPurchasePrice(Double purchasePrice) {
+        this.purchasePrice = purchasePrice;
+    }
+
+    public Double getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(Double discount) {
+        this.discount = discount;
     }
 }

@@ -1,62 +1,80 @@
-
-// InventoryMapper.java
 package com.mediShop.inventory.infrastructure.persistence.mapper;
 
 import com.mediShop.inventory.domain.entity.Inventory;
 import com.mediShop.inventory.infrastructure.persistence.entity.InventoryJpaEntity;
 import org.springframework.stereotype.Component;
-import java.math.BigDecimal;
 
 @Component
 public class InventoryMapper {
     
-    public InventoryJpaEntity toJpaEntity(Inventory inventory) {
-        if (inventory == null) {
-            return null;
-        }
-        System.out.println("----------------------------------InventoryMapper.toJpaEntity: ----------------------------------- "+inventory);
-        InventoryJpaEntity entity = new InventoryJpaEntity();
-        entity.setInventoryId(inventory.getInventoryId());
-        entity.setMedicineId(inventory.getMedicineId());
-        entity.setBatchNumber(inventory.getBatchNumber());
-        entity.setCompanyName(inventory.getCompanyName());
-        entity.setExpiryDate(inventory.getExpiryDate());
-        entity.setLocation(inventory.getLocation());
-        entity.setLastUpdated(inventory.getLastUpdated());
-        entity.setType(inventory.getType());
-        entity.setSupplierId(inventory.getSupplierId());
-        entity.setBuyingDate(inventory.getBuyingDate());
-        entity.setTotalQuantity(inventory.getTotalQuantity());
-        entity.setAvailableQuantity(inventory.getAvailableQuantity());
-        entity.setUnitPrice(inventory.getUnitPrice());
-        entity.setBuyingPrice(inventory.getBuyingPrice());
-        entity.setDiscount(inventory.getDiscount() != null ? inventory.getDiscount() : BigDecimal.ZERO);
-
-        System.out.println("----------------------------------InventoryMapper.toJpaEntity: ----------------------------------- "+inventory.getType());
-        
-        return entity;
-    }
-    
-    public Inventory toDomainEntity(InventoryJpaEntity entity) {
+    public Inventory toDomain(InventoryJpaEntity entity) {
         if (entity == null) {
             return null;
         }
         
         return new Inventory(
             entity.getInventoryId(),
-            entity.getMedicineId(),
+            entity.getMedicineName(),
             entity.getBatchNumber(),
             entity.getCompanyName(),
             entity.getExpiryDate(),
             entity.getLocation(),
+            entity.getLastUpdated(),
             entity.getType(),
-            entity.getSupplierId(),
-            entity.getBuyingDate(),
+            entity.getPurchaseDate(),
             entity.getTotalQuantity(),
             entity.getAvailableQuantity(),
             entity.getUnitPrice(),
-            entity.getBuyingPrice(),
-            entity.getDiscount() != null ? entity.getDiscount() : BigDecimal.ZERO
+            entity.getPurchasePrice(),
+            entity.getDiscount()
         );
+    }
+    
+    public InventoryJpaEntity toEntity(Inventory domain) {
+        if (domain == null) {
+            return null;
+        }
+        
+        InventoryJpaEntity entity = new InventoryJpaEntity(
+            domain.getMedicineName(),
+            domain.getBatchNumber(),
+            domain.getCompanyName(),
+            domain.getExpiryDate(),
+            domain.getLocation(),
+            domain.getLastUpdated(),
+            domain.getType(),
+            domain.getPurchaseDate(),
+            domain.getTotalQuantity(),
+            domain.getAvailableQuantity(),
+            domain.getUnitPrice(),
+            domain.getPurchasePrice(),
+            domain.getDiscount()
+        );
+        
+        if (domain.getInventoryId() != null) {
+            entity.setInventoryId(domain.getInventoryId());
+        }
+        
+        return entity;
+    }
+    
+    public void updateEntity(InventoryJpaEntity entity, Inventory domain) {
+        if (entity == null || domain == null) {
+            return;
+        }
+        
+        entity.setMedicineName(domain.getMedicineName());
+        entity.setBatchNumber(domain.getBatchNumber());
+        entity.setCompanyName(domain.getCompanyName());
+        entity.setExpiryDate(domain.getExpiryDate());
+        entity.setLocation(domain.getLocation());
+        entity.setLastUpdated(domain.getLastUpdated());
+        entity.setType(domain.getType());
+        entity.setPurchaseDate(domain.getPurchaseDate());
+        entity.setTotalQuantity(domain.getTotalQuantity());
+        entity.setAvailableQuantity(domain.getAvailableQuantity());
+        entity.setUnitPrice(domain.getUnitPrice());
+        entity.setPurchasePrice(domain.getPurchasePrice());
+        entity.setDiscount(domain.getDiscount());
     }
 }

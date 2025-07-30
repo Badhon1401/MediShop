@@ -1,121 +1,67 @@
-// InventoryJpaRepository.java
 package com.mediShop.inventory.infrastructure.persistence.repository;
 
 import com.mediShop.inventory.infrastructure.persistence.entity.InventoryJpaEntity;
-import com.mediShop.medicine.domain.valueobject.MedicineType;
+import com.mediShop.inventory.domain.valueobject.MedicineType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
 public interface InventoryJpaRepository extends JpaRepository<InventoryJpaEntity, Integer> {
-
-//    System.out.println("----------------------------------InventoryJpaRepository before DB: ----------------------------------- ");
-    List<InventoryJpaEntity> findByMedicineId(Integer medicineId);
-
+    
+    // Search and filter methods
+    List<InventoryJpaEntity> findByMedicineNameContainingIgnoreCase(String medicineName);
     List<InventoryJpaEntity> findByBatchNumber(String batchNumber);
-
     List<InventoryJpaEntity> findByCompanyNameContainingIgnoreCase(String companyName);
-
-    List<InventoryJpaEntity> findByLocationContainingIgnoreCase(String location);
-
     List<InventoryJpaEntity> findByType(MedicineType type);
-
-    List<InventoryJpaEntity> findBySupplierId(Integer supplierId);
-
-    @Query("SELECT i FROM InventoryJpaEntity i WHERE i.expiryDate <= :date")
-    List<InventoryJpaEntity> findExpiringBefore(@Param("date") LocalDate date);
-
+    List<InventoryJpaEntity> findByLocation(String location);
+    
+    // Stock-related queries
+    List<InventoryJpaEntity> findByAvailableQuantityLessThanEqual(Integer threshold);
+    List<InventoryJpaEntity> findByAvailableQuantityGreaterThan(Integer quantity);
+    List<InventoryJpaEntity> findByTotalQuantityBetween(Integer minQuantity, Integer maxQuantity);
+    
+    // Expiry-related queries
+    List<InventoryJpaEntity> findByExpiryDateBefore(LocalDate date);
+    List<InventoryJpaEntity> findByExpiryDateBetween(LocalDate startDate, LocalDate endDate);
+    
     @Query("SELECT i FROM InventoryJpaEntity i WHERE i.expiryDate < CURRENT_DATE")
-    List<InventoryJpaEntity> findExpiredInventory();
-
+    List<InventoryJpaEntity> findExpiredItems();
+    
+    @Query("SELECT i FROM InventoryJpaEntity i WHERE i.expiryDate <= :expiryDate")
+    List<InventoryJpaEntity> findExpiringItems(@Param("expiryDate") LocalDate expiryDate);
+    
+    // Purchase-related queries
+    List<InventoryJpaEntity> findByPurchaseDateBetween(LocalDate startDate, LocalDate endDate);
+    List<InventoryJpaEntity> findByPurchasePriceBetween(Double minPrice, Double maxPrice);
+    List<InventoryJpaEntity> findByUnitPriceBetween(Double minPrice, Double maxPrice);
+    
+    // Complex search query
+    @Query("SELECT i FROM InventoryJpaEntity i WHERE " +
+           "(:medicineName IS NULL OR UPPER(i.medicineName) LIKE UPPER(CONCAT('%', :medicineName, '%'))) AND " +
+           "(:batchNumber IS NULL OR i.batchNumber = :batchNumber) AND " +
+           "(:companyName IS NULL OR UPPER(i.companyName) LIKE UPPER(CONCAT('%', :companyName, '%'))) AND " +
+           "(:type IS NULL OR i.type = :type) AND " +
+           "(:location IS NULL OR i.location = :location)")
+    List<InventoryJpaEntity> searchInventory(@Param("medicineName") String medicineName,
+                                            @Param("batchNumber") String batchNumber,
+                                            @Param("companyName") String companyName,
+                                            @Param("type") MedicineType type,
+                                            @Param("location") String location);
+    
+    // Stock value calculations
+    @Query("SELECT SUM(i.availableQuantity * i.unitPrice) FROM InventoryJpaEntity i")
+    Double calculateTotalStockValue();
+    
+    @Query("SELECT SUM(i.availableQuantity * i.unitPrice) FROM InventoryJpaEntity i WHERE i.location = :location")
+    Double calculateStockValueByLocation(@Param("location") String location);
+    
+    // Low stock items
     @Query("SELECT i FROM InventoryJpaEntity i WHERE i.availableQuantity <= :threshold")
     List<InventoryJpaEntity> findLowStockItems(@Param("threshold") Integer threshold);
-
-    @Query("SELECT i FROM InventoryJpaEntity i WHERE i.availableQuantity = 0")
-    List<InventoryJpaEntity> findOutOfStockItems();
-
-    List<InventoryJpaEntity> findByBuyingDateBetween(LocalDate startDate, LocalDate endDate);
-
-    List<InventoryJpaEntity> findByUnitPriceBetween(BigDecimal minPrice, BigDecimal maxPrice);
-
-    List<InventoryJpaEntity> findByAvailableQuantityGreaterThan(Integer quantity);
-
-    boolean existsByMedicineIdAndBatchNumber(Integer medicineId, String batchNumber);
-
-    @Query("SELECT SUM(i.unitPrice * i.availableQuantity) FROM InventoryJpaEntity i")
-    BigDecimal getTotalInventoryValue();
-
-    @Query("SELECT SUM(i.availableQuantity) FROM InventoryJpaEntity i")
-    Integer getTotalAvailableQuantity();
-
-    @Query("SELECT i FROM InventoryJpaEntity i WHERE i.availableQuantity <= 10")
-    List<InventoryJpaEntity> findLowStockInventory();
-
-    @Query("SELECT i FROM InventoryJpaEntity i WHERE i.availableQuantity <= :threshold")
-    List<InventoryJpaEntity> findLowStockInventoryWithThreshold(@Param("threshold") Integer threshold);
-
-    // New methods for expiring inventory with days parameter
-    @Query("SELECT i FROM InventoryJpaEntity i WHERE i.expiryDate <= :expiryDate AND i.expiryDate >= CURRENT_DATE")
-    List<InventoryJpaEntity> findExpiringInventory(@Param("expiryDate") LocalDate expiryDate);
-
-    // Count methods for stats
-    @Query("SELECT COUNT(i) FROM InventoryJpaEntity i")
-    long countTotalItems();
-
-    @Query("SELECT COUNT(i) FROM InventoryJpaEntity i WHERE i.expiryDate < CURRENT_DATE")
-    long countExpiredItems();
-
-    @Query("SELECT COUNT(i) FROM InventoryJpaEntity i WHERE i.availableQuantity <= 10")
-    long countLowStockItems();
-
-    @Query("SELECT COUNT(i) FROM InventoryJpaEntity i WHERE i.expiryDate <= :expiryDate AND i.expiryDate >= CURRENT_DATE")
-    long countExpiringItems(@Param("expiryDate") LocalDate expiryDate);
-
-    @Query("""
-    SELECT i FROM InventoryJpaEntity i
-    WHERE (:medicineName IS NULL OR LOWER(i.medicine.name) LIKE LOWER(CONCAT('%', :medicineName, '%')))
-      AND (:batchNumber IS NULL OR i.batchNumber LIKE CONCAT('%', :batchNumber, '%'))
-      AND (:companyName IS NULL OR LOWER(i.companyName) LIKE LOWER(CONCAT('%', :companyName, '%')))
-      AND (:type IS NULL OR i.type = :type)
-     """)
-     List<InventoryJpaEntity> searchInventory(
-          @Param("medicineName") String medicineName,
-          @Param("batchNumber") String batchNumber,
-          @Param("companyName") String companyName,
-          @Param("type") MedicineType type
-     );
-
-//    System.out.println("----------------------------------InventoryJpaRepository after DB: ----------------------------------- ");
-
-
-//     @Query("SELECT i FROM InventoryJpaEntity i " +
-//            "JOIN MedicineJpaEntity m ON i.medicineId = m.medicineId " +
-//            "WHERE (:medicineName IS NULL OR m.name LIKE %:medicineName%) " +
-//            "AND (:batchNumber IS NULL OR i.batchNumber LIKE %:batchNumber%) " +
-//            "AND (:companyName IS NULL OR i.companyName LIKE %:companyName%) " +
-//            "AND (:type IS NULL OR i.type = :type) " +
-//            "AND (:supplierId IS NULL OR i.supplierId = :supplierId) " +
-//            "AND (:location IS NULL OR i.location LIKE %:location%) " +
-//            "AND (:expired IS NULL OR (:expired = true AND i.expiryDate < CURRENT_DATE) OR (:expired = false AND i.expiryDate >= CURRENT_DATE)) " +
-//            "AND (:lowStock IS NULL OR (:lowStock = true AND i.availableQuantity <= 10) OR (:lowStock = false AND i.availableQuantity > 10)) " +
-//            "AND (:expiryDateFrom IS NULL OR i.expiryDate >= :expiryDateFrom) " +
-//            "AND (:expiryDateTo IS NULL OR i.expiryDate <= :expiryDateTo)")
-//     Page<InventoryJpaEntity> searchInventory(
-//             @Param("medicineName") String medicineName,
-//             @Param("batchNumber") String batchNumber,
-//             @Param("companyName") String companyName,
-//             @Param("type") MedicineType type
-//        //      @Param("supplierId") Integer supplierId,
-//        //      @Param("location") String location,
-//        //      @Param("expired") Boolean expired,
-//        //      @Param("lowStock") Boolean lowStock,
-//        //      @Param("expiryDateFrom") LocalDate expiryDateFrom,
-//        //      @Param("expiryDateTo") LocalDate expiryDateTo,
-//             //Pageable pageable
-//             );
+    
+    // Most sold items (based on difference between total and available quantity)
+    @Query("SELECT i FROM InventoryJpaEntity i ORDER BY (i.totalQuantity - i.availableQuantity) DESC")
+    List<InventoryJpaEntity> findMostSoldItems();
 }

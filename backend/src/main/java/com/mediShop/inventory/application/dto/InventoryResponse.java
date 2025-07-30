@@ -2,74 +2,175 @@
 // InventoryResponse.java
 package com.mediShop.inventory.application.dto;
 
-import com.mediShop.inventory.domain.entity.Inventory;
-import com.mediShop.medicine.domain.valueobject.MedicineType;
-import java.math.BigDecimal;
+import com.mediShop.inventory.domain.valueobject.MedicineType;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class InventoryResponse {
     private Integer inventoryId;
-    private Integer medicineId;
     private String medicineName;
     private String batchNumber;
     private String companyName;
     private LocalDate expiryDate;
     private String location;
+    private LocalDateTime lastUpdated;
     private MedicineType type;
-    private Integer supplierId;
-    private LocalDate buyingDate;
+    private LocalDate purchaseDate;
     private Integer totalQuantity;
     private Integer availableQuantity;
-    private BigDecimal unitPrice;
-    private BigDecimal buyingPrice;
-    private BigDecimal discount;
-    private boolean expired;
-    private boolean lowStock;
-    private LocalDateTime lastUpdated;
+    private Double unitPrice;
+    private Double purchasePrice;
+    private Double discount;
+    private Boolean isExpired;
+    private Boolean isExpiringSoon;
+    private Double stockValue;
+    private Double profit;
 
-    private InventoryResponse() {}
+    // Constructors
+    public InventoryResponse() {}
 
-    public static InventoryResponse from(Inventory inventory) {
-        InventoryResponse response = new InventoryResponse();
-        response.inventoryId = inventory.getInventoryId();
-        response.medicineId = inventory.getMedicineId();
-        response.medicineName = inventory.getMedicineName();
-        response.batchNumber = inventory.getBatchNumber();
-        response.companyName = inventory.getCompanyName();
-        response.expiryDate = inventory.getExpiryDate();
-        response.location = inventory.getLocation();
-        response.type = inventory.getType();
-        response.supplierId = inventory.getSupplierId();
-        response.buyingDate = inventory.getBuyingDate();
-        response.totalQuantity = inventory.getTotalQuantity();
-        response.availableQuantity = inventory.getAvailableQuantity();
-        response.unitPrice = inventory.getUnitPrice();
-        response.buyingPrice = inventory.getBuyingPrice();
-        response.discount = inventory.getDiscount();
-        response.expired = inventory.isExpired();
-        response.lowStock = inventory.isLowStock(31);    // Assuming low stock threshold is 31 days
-        response.lastUpdated = inventory.getLastUpdated();
-        return response;
+    // Getters and Setters
+    public Integer getInventoryId() {
+        return inventoryId;
     }
 
-    // Getters
-    public Integer getInventoryId() { return inventoryId; }
-    public Integer getMedicineId() { return medicineId; }
-    public String getMedicineName() { return medicineName; }
-    public String getBatchNumber() { return batchNumber; }
-    public String getCompanyName() { return companyName; }
-    public LocalDate getExpiryDate() { return expiryDate; }
-    public String getLocation() { return location; }
-    public MedicineType getType() { return type; }
-    public Integer getSupplierId() { return supplierId; }
-    public LocalDate getBuyingDate() { return buyingDate; }
-    public Integer getTotalQuantity() { return totalQuantity; }
-    public Integer getAvailableQuantity() { return availableQuantity; }
-    public BigDecimal getUnitPrice() { return unitPrice; }
-    public BigDecimal getBuyingPrice() { return buyingPrice; }
-    public BigDecimal getDiscount() { return discount; }
-    public boolean isExpired() { return expired; }
-    public boolean isLowStock() { return lowStock; }
-    public LocalDateTime getLastUpdated() { return lastUpdated; }
+    public void setInventoryId(Integer inventoryId) {
+        this.inventoryId = inventoryId;
+    }
+
+    public String getMedicineName() {
+        return medicineName;
+    }
+
+    public void setMedicineName(String medicineName) {
+        this.medicineName = medicineName;
+    }
+
+    public String getBatchNumber() {
+        return batchNumber;
+    }
+
+    public void setBatchNumber(String batchNumber) {
+        this.batchNumber = batchNumber;
+    }
+
+    public String getCompanyName() {
+        return companyName;
+    }
+
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
+    }
+
+    public LocalDate getExpiryDate() {
+        return expiryDate;
+    }
+
+    public void setExpiryDate(LocalDate expiryDate) {
+        this.expiryDate = expiryDate;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public LocalDateTime getLastUpdated() {
+        return lastUpdated;
+    }
+
+    public void setLastUpdated(LocalDateTime lastUpdated) {
+        this.lastUpdated = lastUpdated;
+    }
+
+    public MedicineType getType() {
+        return type;
+    }
+
+    public void setType(MedicineType type) {
+        this.type = type;
+    }
+
+    public LocalDate getPurchaseDate() {
+        return purchaseDate;
+    }
+
+    public void setPurchaseDate(LocalDate purchaseDate) {
+        this.purchaseDate = purchaseDate;
+    }
+
+    public Integer getTotalQuantity() {
+        return totalQuantity;
+    }
+
+    public void setTotalQuantity(Integer totalQuantity) {
+        this.totalQuantity = totalQuantity;
+    }
+
+    public Integer getAvailableQuantity() {
+        return availableQuantity;
+    }
+
+    public void setAvailableQuantity(Integer availableQuantity) {
+        this.availableQuantity = availableQuantity;
+    }
+
+    public Double getUnitPrice() {
+        return unitPrice;
+    }
+
+    public void setUnitPrice(Double unitPrice) {
+        this.unitPrice = unitPrice;
+    }
+
+    public Double getPurchasePrice() {
+        return purchasePrice;
+    }
+
+    public void setPurchasePrice(Double purchasePrice) {
+        this.purchasePrice = purchasePrice;
+    }
+
+    public Double getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(Double discount) {
+        this.discount = discount;
+    }
+
+    public Boolean getIsExpired() {
+        return isExpired;
+    }
+
+    public void setIsExpired(Boolean isExpired) {
+        this.isExpired = isExpired;
+    }
+
+    public Boolean getIsExpiringSoon() {
+        return isExpiringSoon;
+    }
+
+    public void setIsExpiringSoon(Boolean isExpiringSoon) {
+        this.isExpiringSoon = isExpiringSoon;
+    }
+
+    public Double getStockValue() {
+        return stockValue;
+    }
+
+    public void setStockValue(Double stockValue) {
+        this.stockValue = stockValue;
+    }
+
+    public Double getProfit() {
+        return profit;
+    }
+
+    public void setProfit(Double profit) {
+        this.profit = profit;
+    }
 }

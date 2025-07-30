@@ -1,11 +1,7 @@
-// InventoryJpaEntity.java
 package com.mediShop.inventory.infrastructure.persistence.entity;
 
-import com.mediShop.medicine.domain.valueobject.MedicineType;
-import com.mediShop.medicine.infrastructure.persistence.entity.MedicineJpaEntity;
-
+import com.mediShop.inventory.domain.valueobject.MedicineType;
 import jakarta.persistence.*;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -17,15 +13,10 @@ public class InventoryJpaEntity {
     @Column(name = "inventory_id")
     private Integer inventoryId;
 
-    @Column(name = "medicine_id", nullable = false)
-    private Integer medicineId;
+    @Column(name = "medicine_name", nullable = false)
+    private String medicineName;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "medicine_id", insertable = false, updatable = false)
-    private MedicineJpaEntity medicine;
-
-
-    @Column(name = "batch_number", nullable = false)
+    @Column(name = "batch_number", nullable = false, unique = true)
     private String batchNumber;
 
     @Column(name = "company_name", nullable = false)
@@ -34,21 +25,18 @@ public class InventoryJpaEntity {
     @Column(name = "expiry_date", nullable = false)
     private LocalDate expiryDate;
 
-    @Column(name = "location", nullable = false)
+    @Column(name = "location")
     private String location;
 
-    @Column(name = "last_updated")
+    @Column(name = "last_updated", nullable = false)
     private LocalDateTime lastUpdated;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "type", nullable = true)
+    @Column(name = "type", nullable = false)
     private MedicineType type;
 
-    @Column(name = "supplier_id")
-    private Integer supplierId;
-
-    @Column(name = "buying_date", nullable = false)
-    private LocalDate buyingDate;
+    @Column(name = "purchase_date", nullable = false)
+    private LocalDate purchaseDate;
 
     @Column(name = "total_quantity", nullable = false)
     private Integer totalQuantity;
@@ -56,70 +44,155 @@ public class InventoryJpaEntity {
     @Column(name = "available_quantity", nullable = false)
     private Integer availableQuantity;
 
-    @Column(name = "unit_price", nullable = false, precision = 10, scale = 2)
-    private BigDecimal unitPrice;
+    @Column(name = "unit_price", nullable = false)
+    private Double unitPrice;
 
-    @Column(name = "buying_price", nullable = false, precision = 10, scale = 2)
-    private BigDecimal buyingPrice;
+    @Column(name = "purchase_price", nullable = false)
+    private Double purchasePrice;
 
-    @Column(name = "discount", precision = 10, scale = 2)
-    private BigDecimal discount;
+    @Column(name = "discount")
+    private Double discount;
 
-    @PrePersist
-    protected void onCreate() {
-        lastUpdated = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        lastUpdated = LocalDateTime.now();
-    }
-
+    // Default constructor
     public InventoryJpaEntity() {}
 
+    // Constructor without ID
+    public InventoryJpaEntity(String medicineName, String batchNumber, String companyName,
+                             LocalDate expiryDate, String location, LocalDateTime lastUpdated,
+                             MedicineType type, LocalDate purchaseDate, Integer totalQuantity,
+                             Integer availableQuantity, Double unitPrice, Double purchasePrice,
+                             Double discount) {
+        this.medicineName = medicineName;
+        this.batchNumber = batchNumber;
+        this.companyName = companyName;
+        this.expiryDate = expiryDate;
+        this.location = location;
+        this.lastUpdated = lastUpdated;
+        this.type = type;
+        this.purchaseDate = purchaseDate;
+        this.totalQuantity = totalQuantity;
+        this.availableQuantity = availableQuantity;
+        this.unitPrice = unitPrice;
+        this.purchasePrice = purchasePrice;
+        this.discount = discount;
+    }
+
     // Getters and Setters
-    public Integer getInventoryId() { return inventoryId; }
-    public void setInventoryId(Integer inventoryId) { this.inventoryId = inventoryId; }
+    public Integer getInventoryId() {
+        return inventoryId;
+    }
 
-    public Integer getMedicineId() { return medicineId; }
-    public void setMedicineId(Integer medicineId) { this.medicineId = medicineId; }
+    public void setInventoryId(Integer inventoryId) {
+        this.inventoryId = inventoryId;
+    }
 
-    public String getBatchNumber() { return batchNumber; }
-    public void setBatchNumber(String batchNumber) { this.batchNumber = batchNumber; }
+    public String getMedicineName() {
+        return medicineName;
+    }
 
-    public String getCompanyName() { return companyName; }
-    public void setCompanyName(String companyName) { this.companyName = companyName; }
+    public void setMedicineName(String medicineName) {
+        this.medicineName = medicineName;
+    }
 
-    public LocalDate getExpiryDate() { return expiryDate; }
-    public void setExpiryDate(LocalDate expiryDate) { this.expiryDate = expiryDate; }
+    public String getBatchNumber() {
+        return batchNumber;
+    }
 
-    public String getLocation() { return location; }
-    public void setLocation(String location) { this.location = location; }
+    public void setBatchNumber(String batchNumber) {
+        this.batchNumber = batchNumber;
+    }
 
-    public LocalDateTime getLastUpdated() { return lastUpdated; }
-    public void setLastUpdated(LocalDateTime lastUpdated) { this.lastUpdated = lastUpdated; }
+    public String getCompanyName() {
+        return companyName;
+    }
 
-    public MedicineType getType() { return type; }
-    public void setType(MedicineType type) { this.type = type; }
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
+    }
 
-    public Integer getSupplierId() { return supplierId; }
-    public void setSupplierId(Integer supplierId) { this.supplierId = supplierId; }
+    public LocalDate getExpiryDate() {
+        return expiryDate;
+    }
 
-    public LocalDate getBuyingDate() { return buyingDate; }
-    public void setBuyingDate(LocalDate buyingDate) { this.buyingDate = buyingDate; }
+    public void setExpiryDate(LocalDate expiryDate) {
+        this.expiryDate = expiryDate;
+    }
 
-    public Integer getTotalQuantity() { return totalQuantity; }
-    public void setTotalQuantity(Integer totalQuantity) { this.totalQuantity = totalQuantity; }
+    public String getLocation() {
+        return location;
+    }
 
-    public Integer getAvailableQuantity() { return availableQuantity; }
-    public void setAvailableQuantity(Integer availableQuantity) { this.availableQuantity = availableQuantity; }
+    public void setLocation(String location) {
+        this.location = location;
+    }
 
-    public BigDecimal getUnitPrice() { return unitPrice; }
-    public void setUnitPrice(BigDecimal unitPrice) { this.unitPrice = unitPrice; }
+    public LocalDateTime getLastUpdated() {
+        return lastUpdated;
+    }
 
-    public BigDecimal getBuyingPrice() { return buyingPrice; }
-    public void setBuyingPrice(BigDecimal buyingPrice) { this.buyingPrice = buyingPrice; }
+    public void setLastUpdated(LocalDateTime lastUpdated) {
+        this.lastUpdated = lastUpdated;
+    }
 
-    public BigDecimal getDiscount() { return discount; }
-    public void setDiscount(BigDecimal discount) { this.discount = discount; }
+    public MedicineType getType() {
+        return type;
+    }
+
+    public void setType(MedicineType type) {
+        this.type = type;
+    }
+
+    public LocalDate getPurchaseDate() {
+        return purchaseDate;
+    }
+
+    public void setPurchaseDate(LocalDate purchaseDate) {
+        this.purchaseDate = purchaseDate;
+    }
+
+    public Integer getTotalQuantity() {
+        return totalQuantity;
+    }
+
+    public void setTotalQuantity(Integer totalQuantity) {
+        this.totalQuantity = totalQuantity;
+    }
+
+    public Integer getAvailableQuantity() {
+        return availableQuantity;
+    }
+
+    public void setAvailableQuantity(Integer availableQuantity) {
+        this.availableQuantity = availableQuantity;
+    }
+
+    public Double getUnitPrice() {
+        return unitPrice;
+    }
+
+    public void setUnitPrice(Double unitPrice) {
+        this.unitPrice = unitPrice;
+    }
+
+    public Double getPurchasePrice() {
+        return purchasePrice;
+    }
+
+    public void setPurchasePrice(Double purchasePrice) {
+        this.purchasePrice = purchasePrice;
+    }
+
+    public Double getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(Double discount) {
+        this.discount = discount;
+    }
+
+    @PrePersist
+    @PreUpdate
+    public void updateTimestamp() {
+        this.lastUpdated = LocalDateTime.now();
+    }
 }

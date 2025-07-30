@@ -1,33 +1,33 @@
-
-// GetInventoryByIdUseCase.java
+// GetInventoryUseCase.java
 package com.mediShop.inventory.application.usecase;
 
 import com.mediShop.inventory.domain.entity.Inventory;
 import com.mediShop.inventory.domain.repository.InventoryRepository;
-import com.mediShop.inventory.domain.exception.InventoryNotFoundException;
-import com.mediShop.inventory.application.dto.InventoryResponse;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-@Service
-public class GetInventoryUseCase implements UseCase<Integer, InventoryResponse> {
-    private final InventoryRepository inventoryRepository;
+import java.util.List;
+import java.util.Optional;
 
+@Service
+public class GetInventoryUseCase {
+    
+    private final InventoryRepository inventoryRepository;
+    
+    @Autowired
     public GetInventoryUseCase(InventoryRepository inventoryRepository) {
         this.inventoryRepository = inventoryRepository;
     }
-    // Check if inventory entry already exists for this medicine and batch
-//        if (inventoryRepository.existsByMedicineIdAndBatchNumber(
-//                request.getMedicineId(), request.getBatchNumber())) {
-//            throw new DuplicateInventoryException(
-//                    request.getMedicineId(), request.getBatchNumber());
-//        }
-
-    @Override
-    public InventoryResponse execute(Integer inventoryId) {
-        Inventory inventory = inventoryRepository.findById(inventoryId)
-                .orElseThrow(() -> new InventoryNotFoundException(inventoryId));
-
-        return InventoryResponse.from(inventory);
+    
+    public Optional<Inventory> getInventoryById(Integer inventoryId) {
+        return inventoryRepository.findById(inventoryId);
+    }
+    
+    public List<Inventory> getAllInventory() {
+        return inventoryRepository.findAll();
+    }
+    
+    public boolean existsById(Integer inventoryId) {
+        return inventoryRepository.existsById(inventoryId);
     }
 }
