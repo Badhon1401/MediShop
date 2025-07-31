@@ -11,6 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/medicines")
+//@CrossOrigin(origins = "http://localhost:3000")
 @CrossOrigin(origins = "*")
 public class MedicineController {
     private final AddMedicineUseCase addMedicineUseCase;
