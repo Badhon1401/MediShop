@@ -15,6 +15,7 @@ target/
 target/*
 .idea/*
 application.properties
+application-secrets.properties
 
 
 ### Eclipse ###
@@ -38,6 +39,11 @@ build/
 
 ### VS Code ###
 .vscode/
+frontend/node_modules/
 
 ### Mac OS ###
 .DS_Store
+
+backend/temp/
+frontend/medishop-ui/src/modules/sales/
+frontend/medishop-ui/src/modules/supplier/

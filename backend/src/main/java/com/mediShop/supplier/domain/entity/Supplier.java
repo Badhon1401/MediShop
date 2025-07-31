@@ -1,160 +1,153 @@
+// Supplier.java - Domain Entity
 package com.mediShop.supplier.domain.entity;
 
-import com.mediShop.supplier.domain.valueobject.ContactInfo;
-import com.mediShop.supplier.domain.valueobject.SupplierId;
-
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
+@Entity
+@Table(name = "suppliers")
 public class Supplier {
-    private SupplierId supplierId;
-    private String name;
-    private String contactPerson;
-    private ContactInfo contactInfo;
-    private String address;
-    private String status;
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "supplier_id")
+    private Integer supplierId;
+    
+    @Column(name = "company_name", nullable = false, length = 255)
+    private String companyName;
+    
+    @Column(name = "email", nullable = false, length = 255)
+    private String email;
+    
+    @Column(name = "phone", nullable = false, length = 20)
+    private String phone;
+    
+    @Column(name = "status", nullable = false)
+    private Boolean status = true; // active by default
+    
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
+    
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-
-    // Default constructor
-    public Supplier() {}
-
-    // Constructor with all fields
-    public Supplier(SupplierId supplierId, String name, String contactPerson,
-                   ContactInfo contactInfo, String address, String status,
-                   LocalDateTime createdAt, LocalDateTime updatedAt) {
-        this.supplierId = supplierId;
-        this.name = name;
-        this.contactPerson = contactPerson;
-        this.contactInfo = contactInfo;
-        this.address = address;
-        this.status = status;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
+    
+    // Constructors
+    public Supplier() {
+        this.createdAt = LocalDateTime.now();
+        this.status = true;
     }
-
+    
+    public Supplier(String companyName, String email, String phone) {
+        this();
+        this.companyName = companyName;
+        this.email = email;
+        this.phone = phone;
+    }
+    
     // Getters and Setters
-    public SupplierId getSupplierId() {
+    public Integer getSupplierId() {
         return supplierId;
     }
-
-    public void setSupplierId(SupplierId supplierId) {
+    
+    public void setSupplierId(Integer supplierId) {
         this.supplierId = supplierId;
     }
-
-    public String getName() {
-        return name;
+    
+    public String getCompanyName() {
+        return companyName;
     }
-
-    public void setName(String name) {
-        this.name = name;
+    
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
     }
-
-    public String getContactPerson() {
-        return contactPerson;
+    
+    public String getEmail() {
+        return email;
     }
-
-    public void setContactPerson(String contactPerson) {
-        this.contactPerson = contactPerson;
+    
+    public void setEmail(String email) {
+        this.email = email;
     }
-
-    public ContactInfo getContactInfo() {
-        return contactInfo;
+    
+    public String getPhone() {
+        return phone;
     }
-
-    public void setContactInfo(ContactInfo contactInfo) {
-        this.contactInfo = contactInfo;
+    
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public String getStatus() {
+    
+    public Boolean getStatus() {
         return status;
     }
-
-    public void setStatus(String status) {
+    
+    public void setStatus(Boolean status) {
         this.status = status;
+        this.updatedAt = LocalDateTime.now();
     }
-
+    
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
-
+    
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
-
+    
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
-
+    
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
-
-    // Builder pattern
-    public static Builder builder() {
-        return new Builder();
+    
+    // Business methods
+    public void activate() {
+        this.status = true;
+        this.updatedAt = LocalDateTime.now();
     }
-
-    public static class Builder {
-        private SupplierId supplierId;
-        private String name;
-        private String contactPerson;
-        private ContactInfo contactInfo;
-        private String address;
-        private String status;
-        private LocalDateTime createdAt;
-        private LocalDateTime updatedAt;
-
-        public Builder supplierId(SupplierId supplierId) {
-            this.supplierId = supplierId;
-            return this;
-        }
-
-        public Builder name(String name) {
-            this.name = name;
-            return this;
-        }
-
-        public Builder contactPerson(String contactPerson) {
-            this.contactPerson = contactPerson;
-            return this;
-        }
-
-        public Builder contactInfo(ContactInfo contactInfo) {
-            this.contactInfo = contactInfo;
-            return this;
-        }
-
-        public Builder address(String address) {
-            this.address = address;
-            return this;
-        }
-
-        public Builder status(String status) {
-            this.status = status;
-            return this;
-        }
-
-        public Builder createdAt(LocalDateTime createdAt) {
-            this.createdAt = createdAt;
-            return this;
-        }
-
-        public Builder updatedAt(LocalDateTime updatedAt) {
-            this.updatedAt = updatedAt;
-            return this;
-        }
-
-        public Supplier build() {
-            return new Supplier(supplierId, name, contactPerson, contactInfo,
-                              address, status, createdAt, updatedAt);
-        }
+    
+    public void deactivate() {
+        this.status = false;
+        this.updatedAt = LocalDateTime.now();
+    }
+    
+    public boolean isActive() {
+        return this.status != null && this.status;
+    }
+    
+    @PreUpdate
+    public void preUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Supplier supplier = (Supplier) o;
+        return Objects.equals(supplierId, supplier.supplierId) &&
+               Objects.equals(companyName, supplier.companyName) &&
+               Objects.equals(email, supplier.email);
+    }
+    
+    @Override
+    public int hashCode() {
+        return Objects.hash(supplierId, companyName, email);
+    }
+    
+    @Override
+    public String toString() {
+        return "Supplier{" +
+                "supplierId=" + supplierId +
+                ", companyName='" + companyName + '\'' +
+                ", email='" + email + '\'' +
+                ", phone='" + phone + '\'' +
+                ", status=" + status +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                '}';
     }
 }

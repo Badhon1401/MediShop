@@ -14,8 +14,10 @@ public class GetMedicineUseCase implements UseCase<Integer, MedicineResponse> {
 
     @Override
     public MedicineResponse execute(Integer medicineId) {
+        System.out.println("----------------------------------------------->>>>> inside GetMedicineUseCase method before call ");
         Medicine medicine = medicineRepository.findById(medicineId)
                 .orElseThrow(() -> new MedicineNotFoundException(medicineId));
+        System.out.println("----------------------------------------------->>>>> inside GetMedicineUseCase method after call ");
 
         return MedicineResponse.from(medicine);
     }
