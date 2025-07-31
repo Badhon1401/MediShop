@@ -37,7 +37,7 @@ const CustomerTable: React.FC<CustomerTableProps> = ({
     );
   }
 
-  if (customers.length === 0) {
+  if (!customers || customers.length === 0) {
     return (
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
         <div className="p-8 text-center">

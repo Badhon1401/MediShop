@@ -14,28 +14,54 @@ export const useCustomer = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalCustomers, setTotalCustomers] = useState(0);
+  // const [customers, setCustomers] = useState<Customer[]>([]);
+
+  // const fetchCustomers = useCallback(async (
+  //   page: number = 0, 
+  //   size: number = 10, 
+  //   filters?: CustomerSearchFilters
+  // ) => {
+  //   setLoading(true);
+  //   setError(null);
+    
+  //   try {
+  //     const response = await customerService.getAllCustomers(page, size, filters);
+  //     setCustomers(response.data);
+  //     setTotalPages(Math.ceil(response.total / size));
+  //     setCurrentPage(page);
+  //     setTotalCustomers(response.total);
+  //   } catch (err: any) {
+  //     setError(err.response?.data?.message || 'Failed to fetch customers');
+  //     console.error('Error fetching customers:', err);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // }, []);
 
   const fetchCustomers = useCallback(async (
-    page: number = 0, 
-    size: number = 10, 
-    filters?: CustomerSearchFilters
-  ) => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      const response = await customerService.getAllCustomers(page, size, filters);
-      setCustomers(response.data);
-      setTotalPages(Math.ceil(response.total / size));
-      setCurrentPage(page);
-      setTotalCustomers(response.total);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to fetch customers');
-      console.error('Error fetching customers:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  page: number = 0,
+  size: number = 10,
+  filters?: CustomerSearchFilters
+) => {
+  setLoading(true);
+  setError(null);
+
+  try {
+    const customers = await customerService.getAllCustomers(page, size, filters);
+    setCustomers(customers);
+
+    // Simulate total for now (not real)
+    setTotalPages(1); // or customers.length / size if you fetched all
+    setCurrentPage(0);
+    setTotalCustomers(customers.length);
+  } catch (err: any) {
+    setError(err.response?.data?.message || 'Failed to fetch customers');
+    console.error('Error fetching customers:', err);
+  } finally {
+    setLoading(false);
+  }
+}, []);
+
 
   const createCustomer = useCallback(async (customerData: CreateCustomerRequest): Promise<Customer | null> => {
     setLoading(true);
@@ -43,7 +69,8 @@ export const useCustomer = () => {
     
     try {
       const newCustomer = await customerService.createCustomer(customerData);
-      setCustomers(prev => [newCustomer, ...prev]);
+      // setCustomers(prev => [newCustomer, ...prev]);
+      // const [customers, setCustomers] = useState<Customer[]>([]);
       setTotalCustomers(prev => prev + 1);
       return newCustomer;
     } catch (err: any) {

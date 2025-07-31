@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import type{ Customer, CustomerFormData, CustomerSearchFilters } from '../types';
+import type { Customer, CustomerFormData, CustomerSearchFilters, CustomerApiResponse } from '../types';
 import { useCustomer } from '../hooks/useCustomer';
 import CustomerForm from '../components/CustomerForm';
 import CustomerSearch from '../components/CustomerSearch';
@@ -144,7 +144,10 @@ const CustomerInventoryPage: React.FC = () => {
                 </div>
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-500">Total Customers</p>
-                  <p className="text-2xl font-semibold text-gray-900">{totalCustomers}</p>
+                  <p className="text-2xl font-semibold text-gray-900">
+                    {totalCustomers || 0}
+                  </p>
+
                 </div>
               </div>
             </div>
@@ -160,7 +163,7 @@ const CustomerInventoryPage: React.FC = () => {
                 </div>
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-500">Active Customers</p>
-                  <p className="text-2xl font-semibold text-gray-900">{customers.length}</p>
+                  <p className="text-2xl font-semibold text-gray-900">{customers?.length ?? 0}</p>
                 </div>
               </div>
             </div>
@@ -177,12 +180,16 @@ const CustomerInventoryPage: React.FC = () => {
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-500">New This Month</p>
                   <p className="text-2xl font-semibold text-gray-900">
-                    {customers.filter(c => {
+                    {(customers?.filter(c => {
                       const regDate = new Date(c.registration_date);
                       const now = new Date();
-                      return regDate.getMonth() === now.getMonth() && regDate.getFullYear() === now.getFullYear();
-                    }).length}
+                      return (
+                        regDate.getMonth() === now.getMonth() &&
+                        regDate.getFullYear() === now.getFullYear()
+                      );
+                    })?.length) ?? 0}
                   </p>
+
                 </div>
               </div>
             </div>
@@ -247,25 +254,25 @@ const CustomerInventoryPage: React.FC = () => {
                     </svg>
                   </button>
                 </div>
-                
+
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Customer ID</label>
                     <p className="mt-1 text-sm text-gray-900">#{selectedCustomer.customer_id}</p>
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Name</label>
                     <p className="mt-1 text-sm text-gray-900">{selectedCustomer.name}</p>
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Contact Number</label>
                     <p className="mt-1 text-sm text-gray-900">
                       {selectedCustomer.contact_number || 'Not provided'}
                     </p>
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Registration Date</label>
                     <p className="mt-1 text-sm text-gray-900">
@@ -395,11 +402,10 @@ const CustomerInventoryPage: React.FC = () => {
                       key={i}
                       onClick={() => handlePageChange(i)}
                       disabled={loading}
-                      className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                        i === currentPage
-                          ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
-                          : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                      }`}
+                      className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${i === currentPage
+                        ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
+                        : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                        }`}
                     >
                       {i + 1}
                     </button>
