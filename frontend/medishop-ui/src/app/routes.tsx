@@ -1,7 +1,15 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { MedicineInventoryPage } from '../modules/medicine';
+import { InventoryPage } from '../modules/inventory';
+import { SalesPage, SalesAnalyticsPage } from '../modules/sales';
+import { CustomerInventoryPage } from '../modules/customer';
 import { ROUTES } from '../shared/utils/constants';
+import {SupplierPage } from '../modules/supplier';
+
+
+
+
 
 
 // Layout component (to be implemented)
@@ -21,8 +29,17 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               <a href="/inventory" className="text-gray-600 hover:text-gray-900">
                 Inventory
               </a>
-              <a href="/users" className="text-gray-600 hover:text-gray-900">
-                Users
+              <a href="/sales" className="text-gray-600 hover:text-gray-900">
+                Sales
+              </a>
+              <a href="/sales/analytics" className="text-gray-600 hover:text-gray-900">
+                Sales Analytics
+              </a>
+              <a href="/customers" className="text-gray-600 hover:text-gray-900">
+                Customers
+              </a>
+              <a href="/suppliers" className="text-gray-600 hover:text-gray-900">
+                Suppliers
               </a>
             </div>
           </div>
@@ -41,8 +58,11 @@ export const AppRoutes: React.FC = () => {
           <Route path={ROUTES.HOME} element={<Navigate to={ROUTES.MEDICINES} replace />} />
           <Route path={ROUTES.MEDICINES} element={<MedicineInventoryPage />} />
           {/* Add other routes as modules are implemented */}
-          {/* <Route path={ROUTES.INVENTORY} element={<InventoryPage />} /> */}
-          {/* <Route path={ROUTES.USERS} element={<UsersPage />} /> */}
+          <Route path={ROUTES.INVENTORY} element={<InventoryPage />} />
+          <Route path={ROUTES.SALES} element={<SalesPage />} />
+          <Route path={ROUTES.SALES_ANALYTICS} element={<SalesAnalyticsPage />} />
+          <Route path={ROUTES.CUSTOMERS} element={<CustomerInventoryPage />} />
+          <Route path={ROUTES.SUPPLIERS} element={<SupplierPage />} />
           <Route path="*" element={<Navigate to={ROUTES.MEDICINES} replace />} />
           
         </Routes>

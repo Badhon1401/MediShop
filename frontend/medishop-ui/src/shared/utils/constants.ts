@@ -4,6 +4,7 @@ export const ENDPOINTS = {
   MEDICINES: `${API_BASE_URL}/medicines`,
   USERS: `${API_BASE_URL}/users`,
   INVENTORY: `${API_BASE_URL}/inventory`,
+  CUSTOMERS: `${API_BASE_URL}/customers`,
 } as const;
 
 export const MEDICINE_TYPES = [
@@ -20,7 +21,12 @@ export const ROUTES = {
   MEDICINES: '/medicines',
   USERS: '/users',
   INVENTORY: '/inventory',
+  SALES: '/sales',
+  SALES_ANALYTICS: '/sales/analytics',
   DASHBOARD: '/dashboard',
+  CUSTOMERS: '/customers',
+  SUPPLIERS: '/suppliers',
+ 
 } as const;
 
 export const MESSAGES = {
