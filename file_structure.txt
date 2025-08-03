@@ -1,0 +1,93 @@
+ /MediShop/
+├── backend/
+│   └── src/
+│       ├── main/
+│       │   ├── java/
+│       │   │   └── com.mediShop
+│       │   │       ├── medicine
+│       │   │       │   ├── domain
+│       │   │       │   │   ├── entity
+│       │   │       │   │   ├── repository
+│       │   │       │   │   ├
+│       │   │       │   │   └── valueobject
+│       │   │       │   ├── application
+│       │   │       │   │   ├── usecase
+│       │   │       │   │   ├── dto
+│       │   │       │   │   └── exception
+│       │   │       │   └── infrastructure
+│       │   │       │       ├── web
+│       │   │       │       ├── persistence
+│       │   │       │       └── exception
+│       │   │       │
+│       │   │       ├── user
+│       │   │       │   ├── domain
+│       │   │       │   ├── application
+│       │   │       │   └── infrastructure
+│       │   │       │
+│       │   │       ├── inventory
+│       │   │       │   ├── domain
+│       │   │       │   ├── application
+│       │   │       │   └── infrastructure
+│       │   │       │
+│       │   │       ├── configuration
+│       │   │       │   ├── SecurityConfig.java
+│       │   │       │   ├── OpenApiConfig.java
+│       │   │       │   └── PersistenceConfig.java
+│       │   │       │
+│       │   │       └── MediShopApplication.java
+│       │   │
+│       │   └── resources/
+│       │       ├── application.properties
+│       │       └── static/       # (Optional) for serving frontend build output
+│
+│   └── pom.xml / build.gradle     # Backend build config
+│
+├── frontend/
+│   └── mediShop-ui/
+│       ├── public/
+│       │   └── index.html
+│       │
+│       ├── src/
+│       │   ├── app/
+│       │   │   ├── App.tsx / App.js
+│       │   │   ├── routes.tsx
+│       │   │   ├── store/
+│       │   │   └── hooks/
+│       │   │
+│       │   ├── modules/
+│       │   │   ├── medicine/
+│       │   │   │   ├── components/
+│       │   │   │   ├── pages/
+│       │   │   │   ├── services/
+│       │   │   │   ├── hooks/
+│       │   │   │   └── types/
+│       │   │   │
+│       │   │   ├── user/
+│       │   │   │   ├── components/
+│       │   │   │   ├── pages/
+│       │   │   │   ├── services/
+│       │   │   │   ├── hooks/
+│       │   │   │   └── types/
+│       │   │   │
+│       │   │   └── inventory/
+│       │   │       ├── components/
+│       │   │       ├── pages/
+│       │   │       ├── services/
+│       │   │       ├── hooks/
+│       │   │       └── types/
+│       │   │
+│       │   ├── shared/
+│       │   │   ├── components/
+│       │   │   ├── utils/
+│       │   │   ├── constants/
+│       │   │   ├── styles/
+│       │   │   └── types/
+│       │   │
+│       │   └── index.tsx / index.js
+│       │
+│       ├── package.json
+│       ├── tsconfig.json / jsconfig.json
+│       └── vite.config.js / webpack.config.js
+│
+├── README.md                     # Project-level README
+└── .gitignore                     # Ignore files for both frontend + backend

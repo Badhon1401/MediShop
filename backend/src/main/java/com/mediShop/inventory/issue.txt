@@ -1,0 +1,2 @@
+1. entity te medicine name nai
+2. validateName, validateExpiryDate nai

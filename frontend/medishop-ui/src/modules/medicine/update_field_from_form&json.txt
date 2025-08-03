@@ -1,0 +1,70 @@
+1.MedicineInventoryPage.tsx
+2.MedicineForm.tsx
+3.types/index.ts
+
+
+// update which fields you want to send to backend
+1.MedicineInventoryPage.tsx
+const handleUpdateMedicine = async (e: React.FormEvent) => {
+
+    
+    const medicineData = { !!!
+      name: formData.name,  
+      type: formData.type,
+      category: formData.category,
+      location: formData.location,
+      medicineId: editingMedicine.medicineId,
+      supplierId: formData.supplierId ? parseInt(formData.supplierId) : undefined
+    };  
+  };
+
+3.types/index.ts
+  export interface MedicineUpdateRequest  { !!!
+  medicineId: number;
+  name: string;
+  type: MedicineType;
+  category: string;
+  location?: string;
+  supplierId?: number;
+  }
+
+
+
+// update which fields you want to show on form
+1.MedicineInventoryPage.tsx
+
+  {/* Add Medicine Modal */}
+          <MedicineForm
+            
+            isEditMode={false} !!!
+          />
+        
+
+        {/* Edit Medicine Modal */}
+        <Modal
+        >
+          <MedicineForm
+            isEditMode={true} !!!
+          />
+        </Modal>
+
+2.MedicineForm.tsx
+interface MedicineFormProps {
+  isEditMode: boolean; !!! // To distinguish add vs edit mode
+}
+
+export const MedicineForm: React.FC<MedicineFormProps> = ({
+  isEditMode, !!!
+}) => {
+     {!isEditMode && ( !!!
+        <>
+          <div>
+              Batch Number *
+          </div>
+
+          <div>
+              Expiry Date *
+          </div>
+        </>
+      )}
+}
