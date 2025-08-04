@@ -1,28 +1,39 @@
 package com.mediShop.user.domain.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
-
 import java.util.Date;
 import java.util.UUID;
 
-@Entity
-@Table(name = "user_verification_messages")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class UserVerificationMessage {
 
-    @Id
-    @GeneratedValue
-    private UUID id;
-    @Column(nullable = false)
+    private UUID verificationCodeId;
     private String code;
-    @Column(nullable = false, unique = true)
     private String userEmail;
-    @Column(nullable = false)
     private Date expiry;
 
+    public UserVerificationMessage(UUID id,String code,  String userEmail, Date expiry) {
+        this.verificationCodeId=id;
+        this.code = code;
+        this.userEmail = userEmail;
+        this.expiry = expiry;
+    }
+    public UserVerificationMessage(String code,  String userEmail, Date expiry) {
+        this.code = code;
+        this.userEmail = userEmail;
+        this.expiry = expiry;
+    }
+    public UUID getVerificationCodeId() {
+        return verificationCodeId;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public String getUserEmail() {
+        return userEmail;
+    }
+
+    public Date getExpiry() {
+        return expiry;
+    }
 }

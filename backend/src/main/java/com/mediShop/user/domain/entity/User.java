@@ -1,38 +1,61 @@
 package com.mediShop.user.domain.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
-
 import java.util.UUID;
 
-@Entity
-@Table(name = "medishop_users")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class User {
-
-    @Id
-    @GeneratedValue
     private UUID id;
-
-    @Column(nullable = false, unique = true)
     private String userName;
-
-    @Column(nullable = false)
     private String email;
-
-    @Column(nullable = false)
     private String password;
-
-    @Column(name = "contact_number")
     private String contactNumber;
 
+    public User(UUID id, String userName, String email, String password, String contactNumber) {
+        this.id = id;
+        this.userName = userName;
+        this.email = email;
+        this.password = password;
+        this.contactNumber = contactNumber;
+    }
 
     public User(UUID id) {
         this.id=id;
     }
 
+
+    public UUID getId() {
+        return id;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public String getContactNumber() {
+        return contactNumber;
+    }
+
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void setContactNumber(String contactNumber) {
+        this.contactNumber = contactNumber;
+    }
 }
