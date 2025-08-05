@@ -1,4 +1,4 @@
-package com.mediShop.user.application.dto.usecase;
+package com.mediShop.user.application.usecase;
 
 
 import com.mediShop.user.application.dto.exception.UserNotFoundException;
@@ -7,13 +7,15 @@ import com.mediShop.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class GetUserAccountDetailsUseCase {
     private final UserRepository userRepository;
 
-    public User execute(String username) {
-        return userRepository.findByUserName(username)
+    public User execute(UUID userId) {
+        return userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found."));
     }
 }
