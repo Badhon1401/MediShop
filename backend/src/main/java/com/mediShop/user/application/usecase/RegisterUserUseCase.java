@@ -1,4 +1,4 @@
-package com.mediShop.user.application.dto.usecase;
+package com.mediShop.user.application.usecase;
 
 import com.mediShop.user.application.dto.exception.UsernameTakenException;
 import com.mediShop.user.domain.entity.User;
