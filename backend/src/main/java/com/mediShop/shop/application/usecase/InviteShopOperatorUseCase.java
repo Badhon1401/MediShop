@@ -3,6 +3,7 @@ package com.mediShop.shop.application.usecase;
 import com.mediShop.shop.application.exception.ShopNotFoundException;
 import com.mediShop.shop.application.exception.UnauthorizedException;
 import com.mediShop.shop.application.exception.UserAlreadyExistsException;
+import com.mediShop.shop.application.exception.UserNotFoundException;
 import com.mediShop.shop.domain.entity.Role;
 import com.mediShop.shop.domain.entity.Shop;
 import com.mediShop.shop.domain.entity.ShopOperatorInvitation;
@@ -38,7 +39,7 @@ public class InviteShopOperatorUseCase {
         }
 
         User operatorUser = userRepository.findById(userId)
-                .orElseThrow(() -> new com.mediShop.user.application.dto.exception.UserNotFoundException("Invited user not found."));
+                .orElseThrow(() -> new UserNotFoundException("Invited user not found."));
 
         boolean alreadyOperator = shop.getShopOperatorList().stream()
                 .anyMatch(op -> op.getUser().getId().equals(userId));
