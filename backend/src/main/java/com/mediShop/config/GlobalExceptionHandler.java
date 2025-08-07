@@ -1,5 +1,7 @@
 package com.mediShop.config;
 
+import com.mediShop.medicine.application.exception.MedicineAlreadyExistsException;
+import com.mediShop.medicine.application.exception.MedicineNotFoundException;
 import com.mediShop.shop.application.exception.*;
 import com.mediShop.user.application.exception.*;
 import com.mediShop.user.application.exception.UserNotFoundException;
@@ -86,4 +88,17 @@ public class GlobalExceptionHandler {
     private ResponseEntity<String> buildSimpleResponse(HttpStatus status, String message) {
         return ResponseEntity.status(status).body(message);
     }
+
+    // ---- Medicine-related exceptions ----
+
+    @ExceptionHandler(MedicineNotFoundException.class)
+    public ResponseEntity<?> handleMedicineNotFound(MedicineNotFoundException ex) {
+        return buildDetailedResponse(HttpStatus.NOT_FOUND, ex.getMessage());
+    }
+
+    @ExceptionHandler(MedicineAlreadyExistsException.class)
+    public ResponseEntity<?> handleMedicineAlreadyExists(MedicineAlreadyExistsException ex) {
+        return buildDetailedResponse(HttpStatus.CONFLICT, ex.getMessage());
+    }
+
 }
