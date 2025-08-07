@@ -1,6 +1,6 @@
 package com.mediShop.user.application.usecase;
 
-import com.mediShop.user.application.dto.exception.UserNotFoundException;
+import com.mediShop.user.application.exception.UserNotFoundException;
 import com.mediShop.user.domain.entity.User;
 import com.mediShop.user.domain.entity.UserVerificationMessage;
 import com.mediShop.user.domain.repository.UserRepository;
