@@ -1,4 +1,4 @@
-package com.mediShop.user.application.dto.exception;
+package com.mediShop.user.application.exception;
 
 
 public class VerificationCodeMismatchException extends RuntimeException {

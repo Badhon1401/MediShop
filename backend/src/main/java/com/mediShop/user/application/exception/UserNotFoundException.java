@@ -1,4 +1,4 @@
-package com.mediShop.user.application.dto.exception;
+package com.mediShop.user.application.exception;
 
 public class UserNotFoundException extends RuntimeException {
     public UserNotFoundException(String message) {

@@ -1,8 +1,6 @@
 package com.mediShop.user.application.usecase;
 
-import com.mediShop.user.application.dto.exception.UserEmailMismatchException;
-import com.mediShop.user.application.dto.exception.VerificationCodeExpiredException;
-import com.mediShop.user.application.dto.exception.VerificationCodeMismatchException;
+
 import com.mediShop.user.application.exception.VerificationCodeNotFound;
 import com.mediShop.user.domain.entity.User;
 import com.mediShop.user.domain.entity.UserVerificationMessage;
