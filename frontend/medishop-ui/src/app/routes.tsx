@@ -2,10 +2,10 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { MedicineInventoryPage } from '../modules/medicine';
 import { InventoryPage } from '../modules/inventory';
-import { SalesPage, SalesAnalyticsPage } from '../modules/sales';
+//import { SalesPage, SalesAnalyticsPage } from '../modules/sales';
 import { CustomerInventoryPage } from '../modules/customer';
 import { ROUTES } from '../shared/utils/constants';
-import {SupplierPage } from '../modules/supplier';
+//import {SupplierPage } from '../modules/supplier';
 
 
 
