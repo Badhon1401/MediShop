@@ -1,52 +1,32 @@
-package com.mediShop.medicine.infrastructure.persistence.entity;
+package com.mediShop.medicine.application.dto;
 
-import com.mediShop.shop.infrastructure.persistence.entity.ShopJpaEntity;
-import jakarta.persistence.*;
+
 import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.UUID;
 
-@Entity
-@Table(
-        name = "medishop_medicines",
-        uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"shop_id", "name", "power"})
-        }
-)
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class MedicineJpaEntity {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "shop_id", nullable = false)
-    private ShopJpaEntity shop;
+public class MedicineRequestDto {
 
     @NotBlank(message = "Medicine name is required")
-    @Column(nullable = false)
     private String name;
 
     private String groupName;
 
     @Min(value = 0, message = "Power must be non-negative")
-    @Column(nullable = false)
-    private Integer power;
+    private Integer power;  // Changed to Integer (nullable)
 
     private String category;
 
     @DecimalMin(value = "0.01", message = "Price must be at least 0.01")
     @DecimalMax(value = "99999.99", message = "Price cannot exceed 99999.99")
     @NotNull(message = "Price is required")
-    @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
 
     private String givenFor;
@@ -54,12 +34,10 @@ public class MedicineJpaEntity {
     @Min(value = 0, message = "Available quantity cannot be negative")
     private Integer availableQuantity;
 
-    @PastOrPresent(message = "Manufactured date cannot be in the past")
-    @Temporal(TemporalType.DATE)
+    @PastOrPresent(message = "Manufactured date cannot be in the future")
     private Date manufacturedDate;
 
     @Future(message = "Expiry date must be in the future")
-    @Temporal(TemporalType.DATE)
     private Date expiryDate;
 
     @Min(value = 0, message = "Position must be non-negative")
@@ -67,10 +45,5 @@ public class MedicineJpaEntity {
 
     @DecimalMin(value = "0.0", message = "Discount cannot be negative")
     @DecimalMax(value = "100.0", message = "Discount cannot exceed 100%")
-    @Column(precision = 5, scale = 2)
     private BigDecimal discountPercentage;
-
-    public MedicineJpaEntity(UUID id) {
-        this.id = id;
-    }
 }
