@@ -2,6 +2,8 @@ package com.mediShop.shop.infrastructure.persistence.repository;
 
 import com.mediShop.shop.domain.entity.ShopOperatorInvitation;
 import com.mediShop.shop.domain.repository.ShopOperatorInvitationRepository;
+import com.mediShop.shop.infrastructure.persistence.mapper.ShopOperatorInvitationMapper;
+import com.mediShop.shop.infrastructure.persistence.mapper.ShopOperatorMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -16,19 +18,19 @@ public class ShopOperatorInvitationRepositoryImpl implements ShopOperatorInvitat
 
     @Override
     public ShopOperatorInvitation save(ShopOperatorInvitation invitation) {
-        return DomainMapperService.mapToShopOperatorInvitationDomain(repository.save(DomainMapperService.mapToShopOperatorInvitationJpaEntity(invitation)));
+        return ShopOperatorInvitationMapper.mapToShopOperatorInvitationDomain(repository.save(ShopOperatorInvitationMapper.mapToShopOperatorInvitationJpaEntity(invitation)));
     }
 
     @Override
     public Optional<ShopOperatorInvitation> findById(UUID invitationId) {
-        return repository.findById(invitationId).map(DomainMapperService::mapToShopOperatorInvitationDomain);
+        return repository.findById(invitationId).map(ShopOperatorInvitationMapper::mapToShopOperatorInvitationDomain);
     }
 
 
 
     @Override
     public void delete(ShopOperatorInvitation invitation) {
-            repository.delete(DomainMapperService.mapToShopOperatorInvitationJpaEntity(invitation));
+            repository.delete(ShopOperatorInvitationMapper.mapToShopOperatorInvitationJpaEntity(invitation));
     }
 
     @Override

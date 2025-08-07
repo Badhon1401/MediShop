@@ -5,6 +5,8 @@ import com.mediShop.shop.domain.entity.Role;
 import com.mediShop.shop.domain.entity.ShopOperator;
 import com.mediShop.shop.domain.repository.ShopOperatorRepository;
 import com.mediShop.shop.infrastructure.persistence.entity.ShopOperatorJpaEntity;
+import com.mediShop.shop.infrastructure.persistence.mapper.RoleMapper;
+import com.mediShop.shop.infrastructure.persistence.mapper.ShopOperatorMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,18 +28,18 @@ public class ShopOperatorRepositoryImpl implements ShopOperatorRepository {
 
     @Override
     public boolean existsByUserIdAndShopIdAndRole(UUID userId, UUID shopId, Role role){
-        return repository.existsByUserIdAndShopIdAndRole(userId,shopId,DomainMapperService.mapToEntityUserRole(role));
+        return repository.existsByUserIdAndShopIdAndRole(userId,shopId, RoleMapper.mapToEntityUserRole(role));
     }
 
     @Override
     public Optional<ShopOperator> findByUserIdAndRole(UUID userId, Role role) {
-        return repository.findByUserIdAndRole(userId, DomainMapperService.mapToEntityUserRole(role))
-                .map(DomainMapperService::mapToShopOperatorDomain);
+        return repository.findByUserIdAndRole(userId, RoleMapper.mapToEntityUserRole(role))
+                .map(ShopOperatorMapper::mapToShopOperatorDomain);
     }
 
     @Override
     public ShopOperator  save(ShopOperator operator) {
-        return DomainMapperService.mapToShopOperatorDomain(repository.save(DomainMapperService.mapToShopOperatorJpaEntity(operator)));
+        return ShopOperatorMapper.mapToShopOperatorDomain(repository.save(ShopOperatorMapper.mapToShopOperatorJpaEntity(operator)));
     }
 
 
@@ -46,14 +48,14 @@ public class ShopOperatorRepositoryImpl implements ShopOperatorRepository {
         List<ShopOperatorJpaEntity> entities = repository.findByUser_Id(userId);
 
         return entities.stream()
-                .map(DomainMapperService::mapToShopOperatorDomain)
+                .map(ShopOperatorMapper::mapToShopOperatorDomain)
                 .toList();
     }
 
 
     @Override
     public void delete(ShopOperator operator) {
-           repository.delete(DomainMapperService.mapToShopOperatorJpaEntity(operator));
+           repository.delete(ShopOperatorMapper.mapToShopOperatorJpaEntity(operator));
 
     }
 
@@ -71,7 +73,7 @@ public class ShopOperatorRepositoryImpl implements ShopOperatorRepository {
 
     @Override
     public Optional<ShopOperator> findById(UUID operatorId) {
-        return repository.findById(operatorId).map(DomainMapperService::mapToShopOperatorDomain);
+        return repository.findById(operatorId).map(ShopOperatorMapper::mapToShopOperatorDomain);
     }
 
     @Override

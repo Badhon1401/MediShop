@@ -11,6 +11,7 @@ import com.mediShop.shop.domain.entity.ShopOperatorInvitation;
 import com.mediShop.shop.domain.repository.ShopOperatorInvitationRepository;
 import com.mediShop.shop.domain.repository.ShopOperatorRepository;
 import com.mediShop.shop.infrastructure.persistence.entity.UserRole;
+import com.mediShop.shop.infrastructure.persistence.mapper.RoleMapper;
 import com.mediShop.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -73,12 +74,12 @@ public class RespondToOperatorInvitationUseCase {
     private void addOperatorToShop(Shop shop, User user, Role role) {
         UserRole userRole = UserRole.valueOf(role.name());
 
-        Optional<ShopOperator> existing = operatorRepository.findByUserIdAndRole(user.getId(), DomainMapperService.mapToDomainRole(userRole));
+        Optional<ShopOperator> existing = operatorRepository.findByUserIdAndRole(user.getId(), RoleMapper.mapToDomainRole(userRole));
 
         ShopOperator operator = existing.orElseGet(() -> {
             ShopOperator newOp = new ShopOperator();
             newOp.setUser(user);
-            newOp.setRole(DomainMapperService.mapToDomainRole(userRole));
+            newOp.setRole(RoleMapper.mapToDomainRole(userRole));
             newOp.setShopList(new HashSet<>());
             return operatorRepository.save(newOp);
         });

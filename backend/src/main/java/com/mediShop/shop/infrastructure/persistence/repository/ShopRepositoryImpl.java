@@ -4,6 +4,7 @@ package com.mediShop.shop.infrastructure.persistence.repository;
 import com.mediShop.shop.domain.entity.Shop;
 import com.mediShop.shop.domain.repository.ShopRepository;
 import com.mediShop.shop.infrastructure.persistence.entity.ShopJpaEntity;
+import com.mediShop.shop.infrastructure.persistence.mapper.ShopMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -21,17 +22,17 @@ public class ShopRepositoryImpl implements ShopRepository {
 
     @Override
     public Shop save(Shop shop) {
-        return DomainMapperService.mapToShopDomain(shopJpaRepository.save(DomainMapperService.mapToShopJpaEntity(shop)));
+        return ShopMapper.mapToShopDomain(shopJpaRepository.save(ShopMapper.mapToShopJpaEntity(shop)));
     }
 
     @Override
     public Optional<Shop> findById(UUID shopId) {
-        return shopJpaRepository.findById(shopId).map(DomainMapperService::mapToShopDomain);
+        return shopJpaRepository.findById(shopId).map(ShopMapper::mapToShopDomain);
     }
 
     @Override
     public Optional<Shop> findWithOwnerById(UUID shopId) {
-        return shopJpaRepository.findWithOwnerById(shopId).map(DomainMapperService::mapToShopDomain);
+        return shopJpaRepository.findWithOwnerById(shopId).map(ShopMapper::mapToShopDomain);
     }
 
 
@@ -41,7 +42,7 @@ public class ShopRepositoryImpl implements ShopRepository {
     public Set<Shop> findByOwnerId(UUID ownerId) {
         Set<ShopJpaEntity> entities = shopJpaRepository.findByOwnerId(ownerId);
         return entities.stream()
-                .map(DomainMapperService::mapToShopDomain)
+                .map(ShopMapper::mapToShopDomain)
                 .collect(Collectors.toSet());
     }
 
@@ -49,7 +50,7 @@ public class ShopRepositoryImpl implements ShopRepository {
     public Set<Shop> findByOperatorUserId(UUID operatorUserId) {
         Set<ShopJpaEntity> entities = shopJpaRepository.findByOperatorUserId(operatorUserId);
         return entities.stream()
-                .map(DomainMapperService::mapToShopDomain)
+                .map(ShopMapper::mapToShopDomain)
                 .collect(Collectors.toSet());
     }
 

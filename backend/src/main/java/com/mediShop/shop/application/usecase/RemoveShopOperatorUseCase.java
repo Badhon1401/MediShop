@@ -21,7 +21,7 @@ public class RemoveShopOperatorUseCase {
     private final ShopOperatorRepository shopOperatorRepository;
 
     @Transactional
-    public void execute(UUID operatorId, UUID shopId, User currentUser) {
+    public String execute(UUID operatorId, UUID shopId, User currentUser) {
         Shop shop = shopRepository.findById(shopId)
                 .orElseThrow(() -> new ShopNotFoundException("Shop not found."));
 
@@ -42,5 +42,6 @@ public class RemoveShopOperatorUseCase {
         if (shopOperatorRepository.countShopsForOperator(operatorId) == 0) {
             shopOperatorRepository.deleteById(operatorId);
         }
+        return "Successfully operation performed";
     }
 }
