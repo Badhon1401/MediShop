@@ -1,3 +1,0 @@
-# Instructions to run the frontend application
-cd frontend/medishop-ui
-npm run dev
