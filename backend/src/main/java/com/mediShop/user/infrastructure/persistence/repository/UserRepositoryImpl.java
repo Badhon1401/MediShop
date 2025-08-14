@@ -1,50 +1,68 @@
-package com.sda.medishop.user.infrastructure.persistence.repository;
+// com/mediShop/user/infrastructure/persistence/repository/UserRepositoryImpl.java
+package com.mediShop.user.infrastructure.persistence.repository;
 
-import com.sda.medishop.user.infrastructure.persistence.mapper.DomainMapperService;
-import com.sda.medishop.user.infrastructure.persistence.repository.UserJpaRepository;
-import com.sda.medishop.user.domain.entity.User;
-import com.sda.medishop.user.domain.repository.UserRepository;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import com.mediShop.user.domain.entity.User;
+import com.mediShop.user.domain.repository.UserRepository;
+import com.mediShop.user.infrastructure.persistence.entity.UserJpaEntity;
+import com.mediShop.user.infrastructure.persistence.mapper.UserMapper;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Repository
 public class UserRepositoryImpl implements UserRepository {
+    private final UserJpaRepository jpaRepository;
 
-    private final UserJpaRepository userJpaRepository;
-
-    @Autowired
-    public UserRepositoryImpl(UserJpaRepository userJpaRepository) {
-        this.userJpaRepository = userJpaRepository;
+    public UserRepositoryImpl(UserJpaRepository jpaRepository) {
+        this.jpaRepository = jpaRepository;
     }
 
     @Override
     public User save(User user) {
-        return DomainMapperService.mapToUserDomain(userJpaRepository.save(DomainMapperService.mapToUserJpaEntity(user)));
+        UserJpaEntity entity = UserMapper.toJpaEntity(user);
+        UserJpaEntity saved = jpaRepository.save(entity);
+        return UserMapper.toDomainEntity(saved);
     }
 
     @Override
-    public Optional<User> findById(UUID userId) {
-        return userJpaRepository.findById(userId)
-                .map(DomainMapperService::mapToUserDomain);
+    public Optional<User> findByEmail(String email) {
+        return jpaRepository
+                .findByEmail(email)
+                .map(UserMapper::toDomainEntity);
     }
 
     @Override
-    public Optional<User> findByUserName(String username) {
-        return userJpaRepository.findByUserName(username)
-                .map(DomainMapperService::mapToUserDomain);
+    public Optional<User> findByPhone(String phone) {
+        return jpaRepository
+                .findByPhone(phone)
+                .map(UserMapper::toDomainEntity);
     }
 
     @Override
-    public List<User> findByEmail(String email) {
-        return userJpaRepository.findByEmail(email)
-                .stream()
-                .map(DomainMapperService::mapToUserDomain)
-                .collect(Collectors.toList());
+    public Optional<User> findById(Integer id) {
+        return jpaRepository
+                .findById(id)
+                .map(UserMapper::toDomainEntity);
+    }
+
+    @Override
+    public Optional<User> findByOtp(String otp) {
+        return jpaRepository
+                .findByOtp(otp)
+                .map(UserMapper::toDomainEntity);
+    }
+
+    @Override
+    public Optional<User> findByEmailOrPhone(String emailOrPhone) {
+        return jpaRepository
+                .findByEmailOrPhone(emailOrPhone, emailOrPhone)
+                .map(UserMapper::toDomainEntity);
+    }
+
+    @Override
+    public void delete(User user) {
+        // either delete by ID or by mapping back to the JPA entity
+        if (user.getId() != null) {
+            jpaRepository.deleteById(user.getId());
+        }
     }
 }

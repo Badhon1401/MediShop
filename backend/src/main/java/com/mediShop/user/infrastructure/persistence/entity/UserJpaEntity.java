@@ -1,40 +1,96 @@
-package com.sda.medishop.user.infrastructure.persistence.entity;
 
+package com.mediShop.user.infrastructure.persistence.entity;
+
+import com.mediShop.user.domain.valueobject.Role;
 import jakarta.persistence.*;
-import lombok.*;
+import jakarta.validation.constraints.NotBlank;
 
-import java.util.UUID;
+import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "medishop_users")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Table(name = "users")
 public class UserJpaEntity {
-
     @Id
-    @GeneratedValue
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
+    private Integer id;
 
-    @Column(nullable = false, unique = true)
-    private String userName;
+    @Column(name = "name", nullable = false)
+    private String name;
 
-    @Column(nullable = false)
+    @Column(name = "email", unique = true, nullable = false)
+    @NotBlank(message = "Email cannot be blank")
     private String email;
 
-    @Column(nullable = false)
+    @Column(name = "phone", unique = true, nullable = false)
+    @NotBlank(message = "Phone cannot be blank")
+    private String phone;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false)
+    private Role role;
+
+    @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "contact_number")
-    private String contactNumber;
+    @Column(name = "otp")
+    private String otp;
 
+    @Column(name = "otp_expires_at")
+    private LocalDateTime otpExpiresAt;
 
-    public UserJpaEntity(UUID id) {
-        this.id=id;
+    @Column(name = "is_verified")
+    private boolean verified;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    public UserJpaEntity() { }
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
     }
 
-}
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 
-//eyJhbGciOiJIUzUxMiJ9.eyJlbWFpbCI6Im1ybWludXM0NDBAZ21haWwuY29tIiwidXNlcm5hbWUiOiJhYmIiLCJzdWIiOiJjNGMxYWY5Yy1lZWI5LTQyNGQtOGE4Mi1kZjdlZWNhYzkwNzUiLCJpYXQiOjE3NTA5MTQ4MTIsImV4cCI6MTc1MjcyOTIxMn0.dTE-6UE2kbAtFV-PsI9-ek-cFNnJEpGAcc15vYDVpuK0D-rWpIZ5CuepJYQ1A06QIiPA_vsgNRgwwLEuIJMoaQ
+    public Integer getId() { return id; }
+    public void setId(Integer id) { this.id = id; }
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
+
+    public Role getRole() { return role; }
+    public void setRole(Role role) { this.role = role; }
+
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
+
+    public String getOtp() { return otp; }
+    public void setOtp(String otp) { this.otp = otp; }
+
+    public LocalDateTime getOtpExpiresAt() { return otpExpiresAt; }
+    public void setOtpExpiresAt(LocalDateTime otpExpiresAt) { this.otpExpiresAt = otpExpiresAt; }
+
+    public boolean isVerified() { return verified; }
+    public void setVerified(boolean verified) { this.verified = verified; }
+
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+}
