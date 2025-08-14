@@ -1,43 +1,44 @@
 package com.mediShop.user.infrastructure.persistence.mapper;
 
-import com.mediShop.user.application.dto.UserRequestDto;
 import com.mediShop.user.domain.entity.User;
 import com.mediShop.user.infrastructure.persistence.entity.UserJpaEntity;
 import org.springframework.stereotype.Component;
 
+
 @Component
 public class UserMapper {
 
-    public static User mapToUserDomain(UserJpaEntity entity) {
-        if (entity == null) {
-            return null;
-        }
+    public static User toDomainEntity(UserJpaEntity jpaEntity) {
         return new User(
-                entity.getId(),
-                entity.getUserName(),
-                entity.getEmail(),
-                entity.getPassword(),
-                entity.getContactNumber()
+                jpaEntity.getId(),
+                jpaEntity.getName(),
+                jpaEntity.getEmail(),
+                jpaEntity.getPhone(),
+                jpaEntity.getPassword(),
+                jpaEntity.getRole(),
+                jpaEntity.getOtp(),
+                jpaEntity.getOtpExpiresAt(),
+                jpaEntity.isVerified(),
+                jpaEntity.getCreatedAt(),
+                jpaEntity.getUpdatedAt()
         );
     }
 
-    public static UserJpaEntity mapToUserJpaEntity(User user) {
-        if (user == null) {
-            return null;
+    public static UserJpaEntity toJpaEntity(User domainEntity) {
+        UserJpaEntity entity = new UserJpaEntity();
+        if (domainEntity.getId() != null) {
+            entity.setId(domainEntity.getId());
         }
-        return new UserJpaEntity(
-                user.getId(),
-                user.getUserName(),
-                user.getEmail(),
-                user.getPassword(),
-                user.getContactNumber()
-        );
-    }
-
-    public static User userDtoToUserDomain(UserRequestDto dto) {
-        if (dto == null) {
-            return null;
-        }
-        return new User(null, dto.getUserName(), dto.getEmail(), dto.getPassword(), dto.getContactNumber());
+        entity.setName(domainEntity.getName());
+        entity.setEmail(domainEntity.getEmail());
+        entity.setPhone(domainEntity.getPhone());
+        entity.setRole(domainEntity.getRole());
+        entity.setPassword(domainEntity.getPassword());
+        entity.setOtp(domainEntity.getOtp());
+        entity.setOtpExpiresAt(domainEntity.getOtpExpiresAt());
+        entity.setVerified(domainEntity.isVerified());
+        entity.setCreatedAt(domainEntity.getCreatedAt());
+        entity.setUpdatedAt(domainEntity.getUpdatedAt());
+        return entity;
     }
 }

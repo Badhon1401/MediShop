@@ -1,36 +1,90 @@
 package com.mediShop.user.application.usecase;
 
-import com.mediShop.user.application.exception.UsernameTakenException;
+import com.mediShop.user.application.dto.*;
+import com.mediShop.user.application.mapper.UserDtoMapper;
 import com.mediShop.user.domain.entity.User;
-import com.mediShop.user.domain.entity.UserVerificationMessage;
+import com.mediShop.user.domain.exception.UserException;
 import com.mediShop.user.domain.repository.UserRepository;
-import com.mediShop.user.domain.repository.UserVerificationMessageRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.mediShop.user.domain.valueobject.Role;
+import com.mediShop.validation.ValidationService;
+import com.mediShop.user.application.service.EmailService;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.UUID;
+import java.util.Optional;
+
 
 @Service
-@RequiredArgsConstructor
 public class RegisterUserUseCase {
-    private final UserRepository userRepository;
-    private final UserVerificationMessageRepository verificationMessageRepository;
+    private final UserRepository userRepo;
+    private final ValidationService validation;
+    private final EmailService emailService;
+    private final PasswordEncoder encoder;
 
-    public UserVerificationMessage execute(User user) {
-        userRepository.findByUserName(user.getUserName())
-                .ifPresent(u -> { throw new UsernameTakenException("Username already exists."); });
-
-        UserVerificationMessage message = generateVerificationCode(user.getEmail());
-        verificationMessageRepository.deleteByUserEmail(user.getEmail());
-        verificationMessageRepository.save(message);
-        return message;
+    public RegisterUserUseCase(UserRepository userRepo, ValidationService validation, EmailService emailService, PasswordEncoder encoder) {
+        this.userRepo = userRepo;
+        this.validation = validation;
+        this.emailService = emailService;
+        this.encoder = encoder;
     }
 
-    private UserVerificationMessage generateVerificationCode(String email) {
-        String code = UUID.randomUUID().toString().substring(0, 6).toUpperCase();
-        return new UserVerificationMessage(code,email,new Date(System.currentTimeMillis() + 7 * 60 * 1000));
+    public UserResponse register(UserRegistrationRequest req) {
+        validation.validateEmail(req.email);
+        validation.validatePhoneNumber(req.phone);
+        validation.validatePassword(req.password);
 
+        String normalizedPhone = validation.normalizePhoneNumber(req.phone);
+        String hashedPassword = encoder.encode(req.password);
+
+        // Check if a user already exists with email
+        Optional<User> existingUserByEmail = userRepo.findByEmail(req.email);
+        if (existingUserByEmail.isPresent()) {
+            User existingUser = existingUserByEmail.get();
+            if (existingUser.isVerified()) {
+                throw new UserException("Email already in use");
+            } else {
+                // Allow re-registration for unverified users - update existing user
+                existingUser.setName(req.name);
+                existingUser.setPhone(normalizedPhone);
+                existingUser.setPassword(hashedPassword);
+                existingUser.assignRole(req.role);
+                existingUser.generateOtp(5);
+
+                User savedUser = userRepo.save(existingUser);
+                emailService.sendOtpEmail(savedUser.getEmail(), savedUser.getOtp());
+                return UserDtoMapper.toUserResponse(savedUser);
+            }
+        }
+
+        // Check if a user already exists with a phone
+        Optional<User> existingUserByPhone = userRepo.findByPhone(normalizedPhone);
+        if (existingUserByPhone.isPresent()) {
+            User existingUser = existingUserByPhone.get();
+            if (existingUser.isVerified()) {
+                throw new UserException("Phone already in use");
+            } else {
+                // Allow re-registration for unverified users - update existing user
+                existingUser.setName(req.name);
+                existingUser.setEmail(req.email);
+                existingUser.setPassword(hashedPassword);
+                existingUser.assignRole(req.role);
+                existingUser.generateOtp(5);
+
+                User savedUser = userRepo.save(existingUser);
+                emailService.sendOtpEmail(savedUser.getEmail(), savedUser.getOtp());
+                return UserDtoMapper.toUserResponse(savedUser);
+            }
+        }
+
+        // Create new user if no existing user found
+        User user = User.create(req.name, req.email, normalizedPhone, hashedPassword, req.role);
+        user.generateOtp(5);
+
+        User saveUser = userRepo.save(user);
+        emailService.sendOtpEmail(saveUser.getEmail(), saveUser.getOtp());
+
+        return UserDtoMapper.toUserResponse(saveUser);
     }
 }

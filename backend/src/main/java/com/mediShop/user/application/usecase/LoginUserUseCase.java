@@ -1,48 +1,62 @@
 package com.mediShop.user.application.usecase;
 
-import com.mediShop.security.JWTService;
+import com.mediShop.security.jwt.JwtUtil;
+import com.mediShop.user.application.dto.UserLoginRequest;
+import com.mediShop.user.application.dto.UserResponse;
+import com.mediShop.user.application.mapper.UserDtoMapper;
 import com.mediShop.user.domain.entity.User;
+import com.mediShop.user.domain.exception.UserException;
 import com.mediShop.user.domain.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import com.mediShop.validation.ValidationService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
-
 @Service
-@RequiredArgsConstructor
 public class LoginUserUseCase {
     private final UserRepository userRepository;
+    private final AuthenticationManager authenticationManager;
+    private final JwtUtil jwtUtil;
+    private final ValidationService validationService;
 
-    private final AuthenticationManager authManager;
+    public LoginUserUseCase(UserRepository userRepository,
+                            AuthenticationManager authenticationManager,
+                            JwtUtil jwtUtil,
+                            ValidationService validationService) {
+        this.userRepository = userRepository;
+        this.authenticationManager = authenticationManager;
+        this.jwtUtil = jwtUtil;
+        this.validationService = validationService;
+    }
 
-    private final JWTService jwtService;
+    public UserResponse login(UserLoginRequest request) {
+        String loginId = request.getLoginIdentifier();
 
-
-    public ResponseEntity<?> execute(String userName, String password) {
         try {
-            Authentication authentication = authManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(userName, password)
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginId, request.getPassword())
             );
-
-            if (authentication.isAuthenticated()) {
-                Optional<User> authenticatedUser = userRepository.findByUserName(userName);
-                return authenticatedUser.map(user -> ResponseEntity.ok(jwtService.generateToken(user.getId(), user.getUserName(), user.getEmail()))).orElseGet(() -> ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User not found in the database."));
-
-
-            } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Authentication failed. Invalid credentials.");
-            }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Authentication failed. Bad credentials.");
+            throw new UserException("Invalid credentials");
         }
+
+        String searchIdentifier = loginId;
+        if (!loginId.contains("@")) {
+            try {
+                searchIdentifier = validationService.normalizePhoneNumber(loginId);
+            } catch (Exception e) {
+                searchIdentifier = loginId;
+            }
+        }
+
+        User user = userRepository.findByEmailOrPhone(searchIdentifier)
+                .orElseThrow(() -> new UserException("User not found"));
+
+        String token = jwtUtil.generateToken(user.getPhone());
+        UserResponse userResponse = UserDtoMapper.toUserResponse(user);
+
+        userResponse.setToken(token);
+
+        return userResponse;
     }
 }
-
-
