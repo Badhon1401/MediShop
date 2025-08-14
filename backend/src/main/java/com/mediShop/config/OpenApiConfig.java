@@ -1,4 +1,4 @@
-package com.mediShop.medicine.config;
+package com.mediShop.config;
 
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.OpenAPI;

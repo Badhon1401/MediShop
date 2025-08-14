@@ -1,4 +1,4 @@
-package com.mediShop.medicine.config;
+package com.mediShop.config;
 
 import com.mediShop.medicine.application.usecase.*;
 import com.mediShop.medicine.domain.repository.MedicineRepository;
