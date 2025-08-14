@@ -43,6 +43,7 @@ frontend/node_modules/
 backend/node_modules/
 .idea
 backend/.idea
+temp/
 
 ### Mac OS ###
 .DS_Store
