@@ -41,3 +41,8 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+temp/
+backend/node_modules
+frontend/node_modules
+.idea
