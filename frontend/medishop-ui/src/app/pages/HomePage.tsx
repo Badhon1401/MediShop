@@ -1,6 +1,6 @@
 import React from 'react';
-import { useAuth } from '../hooks/useAppAuth';
-import { APP_NAME } from '../../shared/constants/app';
+import { useAuth } from '../store/AuthContext';
+import { APP_NAME, ROUTES } from '../../shared/constants/app';
 
 const HomePage: React.FC = () => {
   const { isAuthenticated } = useAuth();
@@ -23,13 +23,13 @@ const HomePage: React.FC = () => {
             {!isAuthenticated ? (
               <>
                 <a
-                  href="/login"
+                  href={ROUTES.LOGIN}
                   className="group inline-flex items-center justify-center rounded-full py-2 px-4 text-sm font-semibold focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 bg-blue-600 text-white hover:bg-blue-500 active:bg-blue-800 focus-visible:outline-blue-600"
                 >
                   Sign in
                 </a>
                 <a
-                  href="/register"
+                  href={ROUTES.REGISTER}
                   className="group inline-flex ring-1 items-center justify-center rounded-full py-2 px-4 text-sm focus:outline-none ring-slate-200 text-slate-700 hover:text-slate-900 hover:ring-slate-300 active:bg-slate-100 active:text-slate-600 focus-visible:outline-blue-600 focus-visible:ring-slate-300"
                 >
                   Get started
@@ -37,7 +37,7 @@ const HomePage: React.FC = () => {
               </>
             ) : (
               <a
-                href="/app/dashboard"
+                href={ROUTES.DASHBOARD}
                 className="group inline-flex items-center justify-center rounded-full py-2 px-4 text-sm font-semibold focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 bg-blue-600 text-white hover:bg-blue-500 active:bg-blue-800 focus-visible:outline-blue-600"
               >
                 Go to Dashboard

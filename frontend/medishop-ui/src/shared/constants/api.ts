@@ -1,7 +1,7 @@
 export const API_CONFIG = {
-  BASE_URL: import.meta.env.VITE_API_BASE_URL,
-  TIMEOUT: Number(import.meta.env.VITE_API_TIMEOUT),
-  RETRY_ATTEMPTS: Number(import.meta.env.VITE_API_RETRY),
+  BASE_URL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/mediShop',
+  TIMEOUT: Number(import.meta.env.VITE_API_TIMEOUT) || 10000, // Default 10 seconds
+  RETRY_ATTEMPTS: Number(import.meta.env.VITE_API_RETRY) || 3,
 }
 
 export const API_ENDPOINTS = {

@@ -10,16 +10,22 @@ export const ROUTES = {
   FORGOT_PASSWORD: '/forgot-password',
   RESET_PASSWORD: '/reset-password',
   OTP_VERIFICATION: '/verify-otp',
+  UNAUTHORIZED: '/unauthorized',
 
-  // Module routes
-  MEDICINES: '/medicines',
-  INVENTORY: '/inventory',
-  REPORTS: '/reports',
+  // Module routes (with /app prefix for protected routes)
+  MEDICINES: '/app/medicines',
+  INVENTORY: '/app/inventory',
+  SALES: '/app/sales',
+  CUSTOMERS: '/app/customers',
+  SUPPLIERS: '/app/suppliers',
+  USERS: '/app/users',
+  REPORTS: '/app/reports',
 } as const;
 
 export const STORAGE_KEYS = {
-  AUTH_TOKEN: 'authToken',
+  ACCESS_TOKEN: 'accessToken', // Changed to match AuthContext
   USER_DATA: 'userData',
+  AUTH_TOKEN: 'authToken', // Keep for backward compatibility
   THEME: 'theme',
   LANGUAGE: 'language',
 } as const;

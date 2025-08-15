@@ -11,9 +11,12 @@ export const useMedicines = () => {
     setLoading(true);
     setError(null);
     try {
+      console.log('Fetching medicines...');
       const data = await MedicineService.getAllMedicines();
+      console.log('Medicine data received:', data);
       setMedicines(data);
     } catch (err) {
+      console.error('Medicine fetch error:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch medicines');
     } finally {
       setLoading(false);

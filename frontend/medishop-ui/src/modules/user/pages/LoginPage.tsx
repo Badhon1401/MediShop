@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
-import { useAuth } from '../hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../../app/store/AuthContext';
+import { userService } from '../services/userService';
+import { ROUTES } from '../../../shared/constants/app';
 import type {LoginFormData} from '../types';
 
 interface LoginPageProps {
@@ -13,13 +16,15 @@ const LoginPage: React.FC<LoginPageProps> = ({
   onNavigateToForgotPassword,
   onLoginSuccess
 }) => {
-  const { login, loading, error, clearError } = useAuth();
+  const { login, loading } = useAuth();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState<LoginFormData>({
     loginIdentifier: '',
     password: '',
     rememberMe: false
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -27,19 +32,39 @@ const LoginPage: React.FC<LoginPageProps> = ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
-    if (error) clearError();
+    if (error) setError(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+    
     try {
-      await login({
+      console.log('Starting login process...');
+      
+      // Call the userService directly to get the response
+      const response = await userService.login({
         loginIdentifier: formData.loginIdentifier,
         password: formData.password
       });
-      onLoginSuccess?.();
-    } catch (err) {
-      // The hook handles error
+      
+      console.log('Login response:', response);
+      
+      if (response.token && response) {
+        // Use AuthContext login to set the state
+        login(response, response.token);
+        console.log('Login successful, navigating to dashboard...');
+        
+        // Navigate to dashboard
+        navigate(ROUTES.DASHBOARD);
+        onLoginSuccess?.();
+      } else {
+        setError('Login failed: No token received');
+      }
+    } catch (error) {
+      console.error('Login failed:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Login failed';
+      setError(errorMessage);
     }
   };
 

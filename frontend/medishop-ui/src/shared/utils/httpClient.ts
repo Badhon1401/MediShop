@@ -1,4 +1,5 @@
 import { API_CONFIG } from '../constants/api'
+import { STORAGE_KEYS } from '../constants/app'
 
 export interface ApiResponse<T = any> {
   data?: T
@@ -32,11 +33,12 @@ export class HttpClient {
       timeout: number = API_CONFIG.TIMEOUT
   ) {
     this.baseURL = baseURL
-    this.timeout = timeout
+    // Ensure timeout is a valid number, fallback to 10 seconds
+    this.timeout = !isNaN(timeout) && timeout > 0 ? timeout : 10000
   }
 
   private getAuthHeaders(): HeadersInit {
-    const token = localStorage.getItem('authToken')
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN)
     return {
       'Content-Type': 'application/json',
       ...(token ? { Authorization: `Bearer ${token}` } : {}),

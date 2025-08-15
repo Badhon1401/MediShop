@@ -1,5 +1,6 @@
 // src/modules/customer/services/customerService.ts
 
+import { STORAGE_KEYS } from '../../../shared/constants/app';
 import type {
   Customer,
   CreateCustomerRequest,
@@ -20,7 +21,7 @@ class CustomerService {
     const config: RequestInit = {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('authToken') || ''}`,
+        Authorization: `Bearer ${localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN) || ''}`,
         ...options.headers,
       },
       ...options,
@@ -30,7 +31,7 @@ class CustomerService {
 
     if (!response.ok) {
       if (response.status === 401) {
-        localStorage.removeItem('authToken');
+        localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
         window.location.href = '/login';
       }
       const errorData = await response.json().catch(() => ({}));
