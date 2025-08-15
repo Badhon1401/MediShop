@@ -1,5 +1,6 @@
 import { httpClient } from '../../../shared/utils/httpClient';
 import { API_ENDPOINTS } from '../../../shared/constants/api';
+import { STORAGE_KEYS } from '../../../shared/constants/app';
 import type {
   UserRegistrationRequest,
   UserLoginRequest,
@@ -56,15 +57,15 @@ class UserService {
 
   // Auth helper methods
   saveToken(token: string): void {
-    localStorage.setItem('authToken', token);
+    localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, token);
   }
 
   getToken(): string | null {
-    return localStorage.getItem('authToken');
+    return localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
   }
 
   removeToken(): void {
-    localStorage.removeItem('authToken');
+    localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
   }
 
   isAuthenticated(): boolean {

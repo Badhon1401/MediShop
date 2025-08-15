@@ -1,7 +1,7 @@
 import React from 'react';
 import { useProfile } from '../../modules/user/hooks/useProfile';
-// @ts-ignore
-import LoadingSpinner from '../../shared/components/LoadingSpinner';
+import { ROUTES } from '../../shared/constants/app';
+import { Loading } from '../../shared/components/Loading';
 
 const DashboardPage: React.FC = () => {
   const { user, loading, error } = useProfile();
@@ -9,7 +9,7 @@ const DashboardPage: React.FC = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-96">
-        <LoadingSpinner />
+        <Loading />
       </div>
     );
   }
@@ -77,11 +77,11 @@ const DashboardPage: React.FC = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-1">Account Status</label>
                     <p className="text-lg text-gray-900 bg-gray-50 px-3 py-2 rounded border">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        user.verified 
+                        user.isVerified 
                           ? 'bg-green-100 text-green-800' 
                           : 'bg-red-100 text-red-800'
                       }`}>
-                        {user.verified ? 'Verified' : 'Not Verified'}
+                        {user.isVerified ? 'Verified' : 'Not Verified'}
                       </span>
                     </p>
                   </div>
@@ -118,7 +118,7 @@ const DashboardPage: React.FC = () => {
                 <p className="text-gray-600">Update your account information</p>
                 <button
                   className="mt-2 text-blue-600 hover:text-blue-800 font-medium text-sm"
-                  onClick={() => window.location.href = '/app/profile'}
+                  onClick={() => window.location.href = ROUTES.PROFILE}
                 >
                   Manage Profile →
                 </button>
@@ -138,7 +138,9 @@ const DashboardPage: React.FC = () => {
               <div className="ml-4">
                 <h3 className="text-lg font-medium text-gray-900">Medicines</h3>
                 <p className="text-gray-600">Manage your medicine inventory</p>
-                <button className="mt-2 text-green-600 hover:text-green-800 font-medium text-sm">
+                <button className="mt-2 text-green-600 hover:text-green-800 font-medium text-sm"
+                  onClick={() => window.location.href = ROUTES.MEDICINES}
+                >
                   View Medicines →
                 </button>
               </div>
@@ -157,8 +159,10 @@ const DashboardPage: React.FC = () => {
               <div className="ml-4">
                 <h3 className="text-lg font-medium text-gray-900">Inventory</h3>
                 <p className="text-gray-600">Track stock levels and reports</p>
-                <button className="mt-2 text-yellow-600 hover:text-yellow-800 font-medium text-sm">
-                  View Reports →
+                <button className="mt-2 text-yellow-600 hover:text-yellow-800 font-medium text-sm"
+                  onClick={() => window.location.href = ROUTES.INVENTORY}
+                >
+                  View Inventory →
                 </button>
               </div>
             </div>
