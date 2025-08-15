@@ -76,6 +76,19 @@ public class SupplierController {
         return ResponseEntity.ok(response);
     }
     
+    @GetMapping("/exists/{id}")
+    @Operation(summary = "Check if supplier exists", description = "Checks if a supplier exists and is active - for microservice communication")
+    @ApiResponse(responseCode = "200", description = "Supplier check completed")
+    public ResponseEntity<Boolean> supplierExists(
+            @Parameter(description = "Supplier ID", required = true) @PathVariable("id") Integer supplierId) {
+        try {
+            SupplierResponse supplier = getSupplierUseCase.findById(supplierId);
+            return ResponseEntity.ok(supplier != null && supplier.getStatus());
+        } catch (Exception e) {
+            return ResponseEntity.ok(false);
+        }
+    }
+    
     @GetMapping
     @Operation(summary = "Get all suppliers", description = "Retrieves all suppliers in the system")
     @ApiResponse(responseCode = "200", description = "Suppliers retrieved successfully")
