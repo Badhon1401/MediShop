@@ -35,7 +35,7 @@ public class AddSupplierUseCase {
             throw new DuplicateSupplierException("phone", request.getPhone());
         }
         
-        // Create new supplier
+        // Create a new supplier
         Supplier supplier = new Supplier(
             request.getCompanyName(),
             request.getEmail(),
