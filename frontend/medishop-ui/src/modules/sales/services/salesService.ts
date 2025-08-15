@@ -1,34 +1,19 @@
 // src/modules/sales/services/salesService.ts
 
+import { httpClient } from '../../../shared/utils/httpClient';
 import type{ 
-  Sales, 
   SalesRequest, 
   SalesResponse, 
   UpdateSalesRequest, 
   SearchSalesRequest,
-  SalesAnalytics,
   MedicineWiseSales
 } from '../types';
-
-const SALES_API_URL = 'http://localhost:8080/mediShop/api/sales';
 
 class SalesService {
   
   async addSales(salesData: SalesRequest): Promise<SalesResponse> {
     try {
-      const response = await fetch(SALES_API_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(salesData),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      return await response.json();
+      return await httpClient.post<SalesResponse>('/api/sales', salesData);
     } catch (error) {
       console.error('Error adding sales:', error);
       throw error;
@@ -37,18 +22,7 @@ class SalesService {
 
   async getAllSales(): Promise<SalesResponse[]> {
     try {
-      const response = await fetch(SALES_API_URL, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      return await response.json();
+      return await httpClient.get<SalesResponse[]>('/api/sales');
     } catch (error) {
       console.error('Error fetching all sales:', error);
       throw error;
@@ -57,19 +31,7 @@ class SalesService {
 
   async searchSales(searchCriteria: SearchSalesRequest): Promise<SalesResponse[]> {
     try {
-      const response = await fetch(`${SALES_API_URL}/search`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(searchCriteria),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      return await response.json();
+      return await httpClient.post<SalesResponse[]>('/api/sales/search', searchCriteria);
     } catch (error) {
       console.error('Error searching sales:', error);
       throw error;
@@ -78,19 +40,7 @@ class SalesService {
 
   async updateSales(salesData: UpdateSalesRequest): Promise<SalesResponse> {
     try {
-      const response = await fetch(SALES_API_URL, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(salesData),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      return await response.json();
+      return await httpClient.put<SalesResponse>('/api/sales', salesData);
     } catch (error) {
       console.error('Error updating sales:', error);
       throw error;
@@ -99,16 +49,7 @@ class SalesService {
 
   async deleteSales(itemsId: number): Promise<void> {
     try {
-      const response = await fetch(`${SALES_API_URL}/${itemsId}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      await httpClient.delete<void>(`/api/sales/${itemsId}`);
     } catch (error) {
       console.error('Error deleting sales:', error);
       throw error;
@@ -136,21 +77,10 @@ class SalesService {
     return this.searchSales({ salesDate });
   }
 
-  // Analytics methods (assuming backend provides these endpoints)
+  // Analytics methods
   async getTotalSalesAmountByDate(date: string): Promise<number> {
     try {
-      const response = await fetch(`${SALES_API_URL}/analytics/total-amount?date=${date}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      return await response.json();
+      return await httpClient.get<number>(`/api/sales/analytics/total-amount?date=${date}`);
     } catch (error) {
       console.error('Error fetching total sales amount by date:', error);
       throw error;
@@ -159,21 +89,9 @@ class SalesService {
 
   async getTotalSalesAmountBetweenDates(startDate: string, endDate: string): Promise<number> {
     try {
-      const response = await fetch(
-        `${SALES_API_URL}/analytics/total-amount?startDate=${startDate}&endDate=${endDate}`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
+      return await httpClient.get<number>(
+        `/api/sales/analytics/total-amount?startDate=${startDate}&endDate=${endDate}`
       );
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      return await response.json();
     } catch (error) {
       console.error('Error fetching total sales amount between dates:', error);
       throw error;
@@ -182,20 +100,9 @@ class SalesService {
 
   async getMedicineWiseSalesQuantity(): Promise<MedicineWiseSales[]> {
     try {
-      const response = await fetch(`${SALES_API_URL}/analytics/medicine-wise-sales`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
+      const data = await httpClient.get<Array<[string, number]>>('/api/sales/analytics/medicine-wise-sales');
       // Transform the Object[] response to MedicineWiseSales[]
-      return data.map((item: any[]) => ({
+      return data.map((item) => ({
         medicineName: item[0],
         totalQuantity: item[1]
       }));
