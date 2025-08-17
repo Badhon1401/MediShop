@@ -5,9 +5,7 @@ import com.mediShop.medicine.domain.repository.MedicineRepository;
 import com.mediShop.medicine.domain.exception.DuplicateBatchNumberException;
 import com.mediShop.medicine.application.dto.AddMedicineRequest;
 import com.mediShop.medicine.application.dto.MedicineResponse;
-import org.springframework.stereotype.Service;
 
-@Service
 public class AddMedicineUseCase implements UseCase<AddMedicineRequest, MedicineResponse> {
     private final MedicineRepository medicineRepository;
 

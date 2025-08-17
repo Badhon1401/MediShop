@@ -30,6 +30,7 @@ public class MedicineRepositoryImpl implements MedicineRepository {
 
     @Override
     public Optional<Medicine> findById(Integer medicineId) {
+        System.out.println("----------------------------------------------->>>>> inside MedicineRepositoryImpl.findById method with id: " + medicineId);
         return jpaRepository.findById(medicineId)
                 .map(mapper::toDomainEntity);
     }

@@ -2,9 +2,7 @@ package com.mediShop.medicine.application.usecase;
 
 import com.mediShop.medicine.domain.repository.MedicineRepository;
 import com.mediShop.medicine.domain.exception.MedicineNotFoundException;
-import org.springframework.stereotype.Service;
 
-@Service
 public class DeleteMedicineUseCase implements UseCase<Integer, Void> {
     private final MedicineRepository medicineRepository;
 

@@ -1,4 +1,4 @@
-package com.mediShop.customer;// package com.mediShop.customer.infrastructure.configuration;
+// package com.mediShop.customer.infrastructure.configuration;
 
 // import org.springframework.context.annotation.ComponentScan;
 // import org.springframework.context.annotation.Configuration;

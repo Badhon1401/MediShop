@@ -4,11 +4,9 @@ import com.mediShop.medicine.domain.entity.Medicine;
 import com.mediShop.medicine.domain.repository.MedicineRepository;
 import com.mediShop.medicine.application.dto.SearchMedicineRequest;
 import com.mediShop.medicine.application.dto.MedicineResponse;
-import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Service
 public class SearchMedicinesUseCase implements UseCase<SearchMedicineRequest, List<MedicineResponse>> {
     private final MedicineRepository medicineRepository;
 

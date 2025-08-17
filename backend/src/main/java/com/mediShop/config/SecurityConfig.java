@@ -31,23 +31,23 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(authz -> authz
-                        // Public endpoints - no authentication required
-                        .requestMatchers("/api/users/register").permitAll()
-                        .requestMatchers("/api/users/login").permitAll()
-                        .requestMatchers("/api/users/forgot-password").permitAll()
-                        .requestMatchers("/api/users/resend-otp").permitAll()
-                        .requestMatchers("/api/users/verify-otp").permitAll()
-                        .requestMatchers("/api/users/reset-password").permitAll()
-                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                        // Protected endpoints - require authentication
-                        .requestMatchers("/api/users/change-password").authenticated()
-                        .requestMatchers("/api/users/update-profile").authenticated()
-                        .requestMatchers("/api/users/delete-account").authenticated()
-                        .anyRequest().authenticated()
-                )
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+            .authorizeHttpRequests(authz -> authz
+                // Public endpoints - no authentication required
+                .requestMatchers("/api/users/register").permitAll()
+                .requestMatchers("/api/users/login").permitAll()
+                .requestMatchers("/api/users/forgot-password").permitAll()
+                .requestMatchers("/api/users/resend-otp").permitAll()
+                .requestMatchers("/api/users/verify-otp").permitAll()
+                .requestMatchers("/api/users/reset-password").permitAll()
+                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                // Protected endpoints - require authentication
+                .requestMatchers("/api/users/change-password").authenticated()
+                .requestMatchers("/api/users/update-profile").authenticated()
+                .requestMatchers("/api/users/delete-account").authenticated()
+                .anyRequest().authenticated()
+            )
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

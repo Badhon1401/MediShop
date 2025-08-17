@@ -128,18 +128,6 @@ export class HttpClient {
     )
     return this.handleResponse<T>(response)
   }
-
-  async patch<T>(endpoint: string, data?: unknown): Promise<T> {
-    const response = await this.fetchWithTimeout(
-        `${this.baseURL}${endpoint}`,
-        {
-          method: 'PATCH',
-          headers: this.getAuthHeaders(),
-          body: data != null ? JSON.stringify(data) : undefined,
-        }
-    )
-    return this.handleResponse<T>(response)
-  }
 }
 
 export const httpClient = new HttpClient()

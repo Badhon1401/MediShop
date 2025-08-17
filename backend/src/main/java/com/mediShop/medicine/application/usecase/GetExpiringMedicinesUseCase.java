@@ -3,12 +3,10 @@ package com.mediShop.medicine.application.usecase;
 import com.mediShop.medicine.domain.entity.Medicine;
 import com.mediShop.medicine.domain.repository.MedicineRepository;
 import com.mediShop.medicine.application.dto.MedicineResponse;
-import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Service
 public class GetExpiringMedicinesUseCase implements UseCase<Integer, List<MedicineResponse>> {
     private final MedicineRepository medicineRepository;
 

@@ -11,6 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/medicines")
+//@CrossOrigin(origins = "http://localhost:3000")
 @CrossOrigin(origins = "*")
 public class MedicineController {
     private final AddMedicineUseCase addMedicineUseCase;
@@ -50,6 +51,7 @@ public class MedicineController {
 
     @GetMapping("/{id}")
     public ResponseEntity<MedicineResponse> getMedicine(@PathVariable Integer id) {
+        System.out.println("----------------------------------------------->>>>> inside getMedicine method with id: " + id);
         MedicineResponse response = getMedicineUseCase.execute(id);
         return ResponseEntity.ok(response);
     }

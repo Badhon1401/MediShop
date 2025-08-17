@@ -13,8 +13,9 @@ public class MedicineJpaEntity {
     @Column(name = "medicine_id")
     private Integer medicineId;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", nullable = false, unique = true)
     private String name;
+
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)

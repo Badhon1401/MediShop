@@ -26,11 +26,13 @@ public class MedicineExceptionHandler {
 
     @ExceptionHandler(DuplicateBatchNumberException.class)
     public ResponseEntity<ErrorResponse> handleDuplicateBatchNumber(DuplicateBatchNumberException ex) {
+        System.out.println(">>>>> inside DuplicateBatchNumberException handler");
         ErrorResponse error = new ErrorResponse(
                 "DUPLICATE_BATCH_NUMBER",
                 ex.getMessage(),
                 LocalDateTime.now()
         );
+        
         return new ResponseEntity<>(error, HttpStatus.CONFLICT);
     }
 

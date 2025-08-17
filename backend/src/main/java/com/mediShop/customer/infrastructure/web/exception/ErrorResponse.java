@@ -1,4 +1,4 @@
-package com.mediShop.customer.infrastructure.web.exception;// package com.mediShop.medicine.infrastructure.web.exception;
+// package com.mediShop.medicine.infrastructure.web.exception;
 
 // import java.time.LocalDateTime;
 

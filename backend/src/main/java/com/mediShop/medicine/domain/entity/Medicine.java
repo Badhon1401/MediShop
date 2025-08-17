@@ -25,7 +25,8 @@ public class Medicine {
         this.type = type;
         this.category = category;
         this.batchNumber = batchNumber;
-        this.expiryDate = validateExpiryDate(expiryDate);
+//        this.expiryDate = validateExpiryDate(expiryDate);
+        this.expiryDate = expiryDate;
         this.location = location;
         this.supplierId = supplierId;
         this.createdAt = LocalDateTime.now();
@@ -46,15 +47,15 @@ public class Medicine {
         return name.trim();
     }
 
-    private LocalDate validateExpiryDate(LocalDate expiryDate) {
-        if (expiryDate == null) {
-            throw new IllegalArgumentException("Expiry date cannot be null");
-        }
-        if (expiryDate.isBefore(LocalDate.now())) {
-            throw new IllegalArgumentException("Expiry date cannot be in the past");
-        }
-        return expiryDate;
-    }
+//    private LocalDate validateExpiryDate(LocalDate expiryDate) {
+//        if (expiryDate == null) {
+//            throw new IllegalArgumentException("Expiry date cannot be null");
+//        }
+//        if (expiryDate.isBefore(LocalDate.now())) {
+//            throw new IllegalArgumentException("Expiry date cannot be in the past");
+//        }
+//        return expiryDate;
+//    }
 
     public boolean isExpired() {
         return LocalDate.now().isAfter(expiryDate);
