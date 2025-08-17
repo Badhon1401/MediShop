@@ -1,46 +1,14 @@
 // src/modules/customer/services/customerService.ts
 
-import { STORAGE_KEYS } from '../../../shared/constants/app';
+import { httpClient } from '../../../shared/utils/httpClient';
 import type {
   Customer,
   CreateCustomerRequest,
   UpdateCustomerRequest,
   CustomerSearchFilters,
-  CustomerApiResponse,
 } from '../types';
 
-// Fixed: Use the correct endpoint that matches your controller
-const API_BASE_URL = 'http://localhost:8080/mediShop/api/customers';
-
 class CustomerService {
-  private async makeRequest<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<T> {
-    const url = `${API_BASE_URL}${endpoint}`;
-    const config: RequestInit = {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN) || ''}`,
-        ...options.headers,
-      },
-      ...options,
-    };
-
-    const response = await fetch(url, config);
-
-    if (!response.ok) {
-      if (response.status === 401) {
-        localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
-        window.location.href = '/login';
-      }
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
-    }
-
-    return response.json();
-  }
-
   // Get all customers with pagination and filters
   async getAllCustomers(
     page: number = 0,
@@ -61,12 +29,12 @@ class CustomerService {
     }
 
     // Backend returns Customer[] directly, not wrapped in pagination object
-    return this.makeRequest<Customer[]>(`?${params.toString()}`);
+    return httpClient.get<Customer[]>(`/api/customers?${params.toString()}`);
   }
 
   // Get customer by ID
   async getCustomerById(id: number): Promise<Customer> {
-    return this.makeRequest<Customer>(`/${id}`);
+    return httpClient.get<Customer>(`/api/customers/${id}`);
   }
 
   // Create new customer
@@ -75,10 +43,7 @@ class CustomerService {
       throw new Error('Please enter a valid Bangladeshi phone number');
     }
 
-    return this.makeRequest<Customer>('', {
-      method: 'POST',
-      body: JSON.stringify(customerData),
-    });
+    return httpClient.post<Customer>('/api/customers', customerData);
   }
 
   // Update customer
@@ -87,17 +52,12 @@ class CustomerService {
       throw new Error('Please enter a valid Bangladeshi phone number');
     }
 
-    return this.makeRequest<Customer>(`/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(customerData),
-    });
+    return httpClient.put<Customer>(`/api/customers/${id}`, customerData);
   }
 
   // Delete customer
   async deleteCustomer(id: number): Promise<void> {
-    return this.makeRequest<void>(`/${id}`, {
-      method: 'DELETE',
-    });
+    return httpClient.delete<void>(`/api/customers/${id}`);
   }
 
   // Search customers
@@ -111,40 +71,30 @@ class CustomerService {
     });
 
     const queryString = params.toString();
-    const endpoint = queryString ? `/search?${queryString}` : '/search';
+    const endpoint = queryString ? `/api/customers/search?${queryString}` : '/api/customers/search';
 
-    return this.makeRequest<Customer[]>(endpoint);
+    return httpClient.get<Customer[]>(endpoint);
   }
 
   // Get customer purchase history
-  async getCustomerPurchaseHistory(customerId: number): Promise<any[]> {
-    return this.makeRequest<any[]>(`/${customerId}/purchases`);
+  async getCustomerPurchaseHistory(customerId: number): Promise<unknown[]> {
+    return httpClient.get<unknown[]>(`/api/customers/${customerId}/purchases`);
   }
 
   // Get customer statistics
-  async getCustomerStats(): Promise<any> {
-    return this.makeRequest<any>('/stats');
+  async getCustomerStats(): Promise<unknown> {
+    return httpClient.get<unknown>('/api/customers/stats');
   }
 
   // Helper function to validate Bangladeshi phone numbers
   private isValidBangladeshiPhone(phone: string): boolean {
-    const cleanPhone = phone.replace(/[\s\-\+]/g, '');
+    const cleanPhone = phone.replace(/[\s\-+]/g, '');
     const patterns = [
       /^01[3-9]\d{8}$/,
       /^8801[3-9]\d{8}$/,
       /^0\d{10}$/,
     ];
     return patterns.some(pattern => pattern.test(cleanPhone));
-  }
-
-  // Map backend response to frontend Customer format
-  private mapCustomerResponse(response: Customer): Customer {
-    return {
-      customer_id: response.customer_id,
-      name: response.name,
-      contact_number: response.contact_number,
-      registration_date: response.registration_date,
-    };
   }
 }
 

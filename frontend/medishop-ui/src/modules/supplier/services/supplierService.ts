@@ -1,5 +1,6 @@
 // frontend/mediShop-ui/src/modules/supplier/services/supplierService.ts
 
+import { httpClient } from '../../../shared/utils/httpClient';
 import type{ 
   AddSupplierRequest, 
   UpdateSupplierRequest, 
@@ -7,114 +8,46 @@ import type{
   SupplierResponse 
 } from '../types';
 
-
-const SUPPLIER_ENDPOINT = 'http://localhost:8080/mediShop/api/suppliers';
-
 class SupplierService {
   
   // Add a new supplier
   async addSupplier(request: AddSupplierRequest): Promise<SupplierResponse> {
-    const response = await fetch(SUPPLIER_ENDPOINT, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(request),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to add supplier');
-    }
-
-    return response.json();
+    return httpClient.post<SupplierResponse>('/api/suppliers', request);
   }
 
   // Update an existing supplier
   async updateSupplier(supplierId: number, request: UpdateSupplierRequest): Promise<SupplierResponse> {
-    const response = await fetch(`${SUPPLIER_ENDPOINT}/${supplierId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(request),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to update supplier');
-    }
-
-    return response.json();
+    return httpClient.put<SupplierResponse>(`/api/suppliers/${supplierId}`, request);
   }
 
   // Get supplier by ID
   async getSupplierById(supplierId: number): Promise<SupplierResponse> {
-    const response = await fetch(`${SUPPLIER_ENDPOINT}/${supplierId}`);
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Supplier not found');
-    }
-
-    return response.json();
+    return httpClient.get<SupplierResponse>(`/api/suppliers/${supplierId}`);
   }
 
   // Get all suppliers
   async getAllSuppliers(): Promise<SupplierResponse[]> {
-    const response = await fetch(SUPPLIER_ENDPOINT);
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch suppliers');
-    }
-
-    return response.json();
+    return httpClient.get<SupplierResponse[]>('/api/suppliers');
   }
 
   // Get all active suppliers
   async getActiveSuppliers(): Promise<SupplierResponse[]> {
-    const response = await fetch(`${SUPPLIER_ENDPOINT}/active`);
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch active suppliers');
-    }
-
-    return response.json();
+    return httpClient.get<SupplierResponse[]>('/api/suppliers/active');
   }
 
   // Get all inactive suppliers
   async getInactiveSuppliers(): Promise<SupplierResponse[]> {
-    const response = await fetch(`${SUPPLIER_ENDPOINT}/inactive`);
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch inactive suppliers');
-    }
-
-    return response.json();
+    return httpClient.get<SupplierResponse[]>('/api/suppliers/inactive');
   }
 
   // Get supplier by email
   async getSupplierByEmail(email: string): Promise<SupplierResponse> {
-    const response = await fetch(`${SUPPLIER_ENDPOINT}/email/${encodeURIComponent(email)}`);
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Supplier not found');
-    }
-
-    return response.json();
+    return httpClient.get<SupplierResponse>(`/api/suppliers/email/${encodeURIComponent(email)}`);
   }
 
   // Get supplier by company name
   async getSupplierByCompanyName(companyName: string): Promise<SupplierResponse> {
-    const response = await fetch(`${SUPPLIER_ENDPOINT}/company/${encodeURIComponent(companyName)}`);
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Supplier not found');
-    }
-
-    return response.json();
+    return httpClient.get<SupplierResponse>(`/api/suppliers/company/${encodeURIComponent(companyName)}`);
   }
 
   // Search suppliers
@@ -134,53 +67,22 @@ class SupplierService {
       params.append('status', searchRequest.status.toString());
     }
 
-    const response = await fetch(`${SUPPLIER_ENDPOINT}/search?${params.toString()}`);
-
-    if (!response.ok) {
-      throw new Error('Failed to search suppliers');
-    }
-
-    return response.json();
+    return httpClient.get<SupplierResponse[]>(`/api/suppliers/search?${params.toString()}`);
   }
 
   // Delete a supplier
   async deleteSupplier(supplierId: number): Promise<void> {
-    const response = await fetch(`${SUPPLIER_ENDPOINT}/${supplierId}`, {
-      method: 'DELETE',
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to delete supplier');
-    }
+    return httpClient.delete<void>(`/api/suppliers/${supplierId}`);
   }
 
   // Activate a supplier
   async activateSupplier(supplierId: number): Promise<SupplierResponse> {
-    const response = await fetch(`${SUPPLIER_ENDPOINT}/${supplierId}/activate`, {
-      method: 'PATCH',
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to activate supplier');
-    }
-
-    return response.json();
+    return httpClient.put<SupplierResponse>(`/api/suppliers/${supplierId}/activate`);
   }
 
   // Deactivate a supplier
   async deactivateSupplier(supplierId: number): Promise<SupplierResponse> {
-    const response = await fetch(`${SUPPLIER_ENDPOINT}/${supplierId}/deactivate`, {
-      method: 'PATCH',
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to deactivate supplier');
-    }
-
-    return response.json();
+    return httpClient.put<SupplierResponse>(`/api/suppliers/${supplierId}/deactivate`);
   }
 }
 

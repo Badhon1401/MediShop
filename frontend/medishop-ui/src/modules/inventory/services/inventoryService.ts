@@ -1,5 +1,6 @@
 // src/modules/inventory/services/inventoryService.ts
 
+import { httpClient } from '../../../shared/utils/httpClient';
 import type{ 
   Inventory, 
   InventoryResponse, 
@@ -10,182 +11,113 @@ import type{
   MedicineType 
 } from '../types';
 
-const API_BASE_URL = 'http://localhost:8080/mediShop/api/inventory';
-
 class InventoryService {
-  private async request<T>(
-    url: string, 
-    options: RequestInit = {}
-  ): Promise<T> {
-    const response = await fetch(`${API_BASE_URL}${url}`, {
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
-      ...options,
-    });
-
-    if (!response.ok) {
-      const errorData = await response.text();
-      throw new Error(`HTTP ${response.status}: ${errorData || response.statusText}`);
-    }
-
-    if (response.status === 204) {
-      return {} as T;
-    }
-
-    return response.json();
-  }
-
   // Basic CRUD Operations
   async addInventory(request: AddInventoryRequest): Promise<InventoryResponse> {
-    return this.request<InventoryResponse>('', {
-      method: 'POST',
-      body: JSON.stringify(request),
-    });
+    return httpClient.post<InventoryResponse>('/api/inventory', request);
   }
 
   async getInventoryById(id: number): Promise<Inventory> {
-    return this.request<Inventory>(`/${id}`);
+    return httpClient.get<Inventory>(`/api/inventory/${id}`);
   }
 
   async getAllInventory(): Promise<Inventory[]> {
-    return this.request<Inventory[]>('');
+    return httpClient.get<Inventory[]>('/api/inventory');
   }
 
   async updateInventory(id: number, request: UpdateInventoryRequest): Promise<Inventory> {
-    return this.request<Inventory>(`/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(request),
-    });
+    return httpClient.put<Inventory>(`/api/inventory/${id}`, request);
   }
 
   async deleteInventory(id: number): Promise<void> {
-    return this.request<void>(`/${id}`, {
-      method: 'DELETE',
-    });
+    return httpClient.delete<void>(`/api/inventory/${id}`);
   }
 
   // Search Operations
   async searchInventory(searchRequest: InventorySearchRequest): Promise<Inventory[]> {
-    return this.request<Inventory[]>('/search', {
-      method: 'POST',
-      body: JSON.stringify(searchRequest),
-    });
+    return httpClient.post<Inventory[]>('/api/inventory/search', searchRequest);
   }
 
   async searchByMedicineName(medicineName: string): Promise<Inventory[]> {
-    const params = new URLSearchParams({ medicineName });
-    return this.request<Inventory[]>(`/search/medicine?${params}`);
+    return httpClient.get<Inventory[]>(`/api/inventory/search/medicine?medicineName=${encodeURIComponent(medicineName)}`);
   }
 
   async searchByBatchNumber(batchNumber: string): Promise<Inventory[]> {
-    const params = new URLSearchParams({ batchNumber });
-    return this.request<Inventory[]>(`/search/batch?${params}`);
+    return httpClient.get<Inventory[]>(`/api/inventory/search/batch?batchNumber=${encodeURIComponent(batchNumber)}`);
   }
 
   async searchByCompanyName(companyName: string): Promise<Inventory[]> {
-    const params = new URLSearchParams({ companyName });
-    return this.request<Inventory[]>(`/search/company?${params}`);
+    return httpClient.get<Inventory[]>(`/api/inventory/search/company?companyName=${encodeURIComponent(companyName)}`);
   }
 
   async searchByMedicineType(type: MedicineType): Promise<Inventory[]> {
-    const params = new URLSearchParams({ type });
-    return this.request<Inventory[]>(`/search/type?${params}`);
+    return httpClient.get<Inventory[]>(`/api/inventory/search/type?type=${encodeURIComponent(type)}`);
   }
 
   async searchByLocation(location: string): Promise<Inventory[]> {
-    const params = new URLSearchParams({ location });
-    return this.request<Inventory[]>(`/search/location?${params}`);
+    return httpClient.get<Inventory[]>(`/api/inventory/search/location?location=${encodeURIComponent(location)}`);
   }
 
   // Stock Management Operations
   async updateStock(updateRequest: UpdateStockRequest): Promise<Inventory> {
-    return this.request<Inventory>('/stock', {
-      method: 'PUT',
-      body: JSON.stringify(updateRequest),
-    });
+    return httpClient.put<Inventory>('/api/inventory/stock', updateRequest);
   }
 
   async reduceStock(inventoryId: number, quantity: number): Promise<Inventory> {
-    const params = new URLSearchParams({ quantity: quantity.toString() });
-    return this.request<Inventory>(`/stock/${inventoryId}/reduce?${params}`, {
-      method: 'PUT',
-    });
+    return httpClient.put<Inventory>(`/api/inventory/stock/${inventoryId}/reduce?quantity=${quantity}`);
   }
 
   async increaseStock(inventoryId: number, quantity: number): Promise<Inventory> {
-    const params = new URLSearchParams({ quantity: quantity.toString() });
-    return this.request<Inventory>(`/stock/${inventoryId}/increase?${params}`, {
-      method: 'PUT',
-    });
+    return httpClient.put<Inventory>(`/api/inventory/stock/${inventoryId}/increase?quantity=${quantity}`);
   }
 
   async checkStockAvailability(inventoryId: number, requiredQuantity: number): Promise<boolean> {
-    const params = new URLSearchParams({ requiredQuantity: requiredQuantity.toString() });
-    return this.request<boolean>(`/stock/${inventoryId}/available?${params}`);
+    return httpClient.get<boolean>(`/api/inventory/stock/${inventoryId}/available?requiredQuantity=${requiredQuantity}`);
   }
 
   // Low Stock Operations
   async getLowStockItems(threshold: number): Promise<Inventory[]> {
-    const params = new URLSearchParams({ threshold: threshold.toString() });
-    return this.request<Inventory[]>(`/low-stock?${params}`);
+    return httpClient.get<Inventory[]>(`/api/inventory/low-stock?threshold=${threshold}`);
   }
 
   async getItemsWithStockAbove(quantity: number): Promise<Inventory[]> {
-    const params = new URLSearchParams({ quantity: quantity.toString() });
-    return this.request<Inventory[]>(`/stock/above?${params}`);
+    return httpClient.get<Inventory[]>(`/api/inventory/stock/above?quantity=${quantity}`);
   }
 
   async getItemsByStockRange(minQuantity: number, maxQuantity: number): Promise<Inventory[]> {
-    const params = new URLSearchParams({ 
-      minQuantity: minQuantity.toString(),
-      maxQuantity: maxQuantity.toString()
-    });
-    return this.request<Inventory[]>(`/stock/range?${params}`);
+    return httpClient.get<Inventory[]>(`/api/inventory/stock/range?minQuantity=${minQuantity}&maxQuantity=${maxQuantity}`);
   }
 
   // Expiry Operations
   async getExpiredItems(days?: number): Promise<InventoryResponse[]> {
-    const params = days ? new URLSearchParams({ days: days.toString() }) : '';
-    return this.request<InventoryResponse[]>(`/expired?${params}`);
+    const params = days ? `?days=${days}` : '';
+    return httpClient.get<InventoryResponse[]>(`/api/inventory/expired${params}`);
   }
 
   async getExpiringItems(days: number): Promise<InventoryResponse[]> {
-    const params = new URLSearchParams({ days: days.toString() });
-    return this.request<InventoryResponse[]>(`/expiring?${params}`);
+    return httpClient.get<InventoryResponse[]>(`/api/inventory/expiring?days=${days}`);
   }
 
   async getItemsByExpiryRange(startDate: string, endDate: string): Promise<Inventory[]> {
-    const params = new URLSearchParams({ startDate, endDate });
-    return this.request<Inventory[]>(`/expiry/range?${params}`);
+    return httpClient.get<Inventory[]>(`/api/inventory/expiry/range?startDate=${startDate}&endDate=${endDate}`);
   }
 
   // Purchase Date and Price Operations
   async getItemsByPurchaseDateRange(startDate: string, endDate: string): Promise<Inventory[]> {
-    const params = new URLSearchParams({ startDate, endDate });
-    return this.request<Inventory[]>(`/purchase/date-range?${params}`);
+    return httpClient.get<Inventory[]>(`/api/inventory/purchase/date-range?startDate=${startDate}&endDate=${endDate}`);
   }
 
   async getItemsByPurchasePriceRange(minPrice: number, maxPrice: number): Promise<Inventory[]> {
-    const params = new URLSearchParams({ 
-      minPrice: minPrice.toString(),
-      maxPrice: maxPrice.toString()
-    });
-    return this.request<Inventory[]>(`/purchase/price-range?${params}`);
+    return httpClient.get<Inventory[]>(`/api/inventory/purchase/price-range?minPrice=${minPrice}&maxPrice=${maxPrice}`);
   }
 
   async getItemsByUnitPriceRange(minPrice: number, maxPrice: number): Promise<Inventory[]> {
-    const params = new URLSearchParams({ 
-      minPrice: minPrice.toString(),
-      maxPrice: maxPrice.toString()
-    });
-    return this.request<Inventory[]>(`/unit/price-range?${params}`);
+    return httpClient.get<Inventory[]>(`/api/inventory/unit/price-range?minPrice=${minPrice}&maxPrice=${maxPrice}`);
   }
 
   // Health Check
   async healthCheck(): Promise<string> {
-    return this.request<string>('/health');
+    return httpClient.get<string>('/api/inventory/health');
   }
 }
 
