@@ -1,10 +1,10 @@
 package com.mediShop.inventory.application.dto;
 
-import com.mediShop.medicine.domain.valueobject.MedicineType;
+import com.mediShop.inventory.domain.valueobject.MedicineType;
 
 public class SearchInventoryRequest {
     private String name;
-    private MedicineType type;
+    private MedicineType type; // Using inventory module's MedicineType enum
     private String category;
     private String batchNumber;
 
