@@ -18,13 +18,21 @@ public class SupplierApiController {
 
     @GetMapping("/{supplierId}")
     public ResponseEntity<SupplierResponse> getSupplierById(@PathVariable Integer supplierId) {
+<<<<<<< HEAD
         return ResponseEntity.ok(getSupplierUseCase.execute(supplierId));
+=======
+        return ResponseEntity.ok(getSupplierUseCase.findById(supplierId));
+>>>>>>> 1411-Rakibul
     }
 
     @GetMapping("/exists/{supplierId}")
     public ResponseEntity<Boolean> supplierExists(@PathVariable Integer supplierId) {
         try {
+<<<<<<< HEAD
             getSupplierUseCase.execute(supplierId);
+=======
+            getSupplierUseCase.findById(supplierId);
+>>>>>>> 1411-Rakibul
             return ResponseEntity.ok(true);
         } catch (Exception e) {
             return ResponseEntity.ok(false);
