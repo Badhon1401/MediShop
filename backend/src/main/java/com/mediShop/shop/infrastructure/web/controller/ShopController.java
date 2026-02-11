@@ -4,6 +4,7 @@ import com.mediShop.security.UserCredentials;
 import com.mediShop.shop.application.dto.ShopOperatorInvitationRequestDto;
 import com.mediShop.shop.application.dto.ShopOperatorInvitationResponseDto;
 import com.mediShop.shop.application.dto.ShopRequestDto;
+import com.mediShop.shop.application.dto.ShopSummaryResponseDto;
 import com.mediShop.shop.application.usecase.*;
 import com.mediShop.shop.infrastructure.persistence.mapper.ShopMapper;
 import com.mediShop.user.domain.entity.User;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -24,15 +26,17 @@ public class ShopController {
     private final RegisterShopUseCase registerShopUseCase;
     private final RemoveShopOperatorUseCase removeShopOperatorUseCase;
     private final RespondToOperatorInvitationUseCase respondToOperatorInvitationUseCase;
+    private final GetUserAssociatedShopsUseCase getUserAssociatedShopsUseCase;
 
     @Autowired
-    public ShopController(CanAccessShopUseCase canAccessShopUseCase, CanManageShopUseCase canManageShopUseCase, InviteShopOperatorUseCase inviteShopOperatorUseCase, RegisterShopUseCase registerShopUseCase, RemoveShopOperatorUseCase removeShopOperatorUseCase, RespondToOperatorInvitationUseCase respondToOperatorInvitationUseCase) {
+    public ShopController(CanAccessShopUseCase canAccessShopUseCase, CanManageShopUseCase canManageShopUseCase, InviteShopOperatorUseCase inviteShopOperatorUseCase, RegisterShopUseCase registerShopUseCase, RemoveShopOperatorUseCase removeShopOperatorUseCase, RespondToOperatorInvitationUseCase respondToOperatorInvitationUseCase, GetUserAssociatedShopsUseCase getUserAssociatedShopsUseCase) {
         this.canAccessShopUseCase = canAccessShopUseCase;
         this.canManageShopUseCase = canManageShopUseCase;
         this.inviteShopOperatorUseCase = inviteShopOperatorUseCase;
         this.registerShopUseCase = registerShopUseCase;
         this.removeShopOperatorUseCase = removeShopOperatorUseCase;
         this.respondToOperatorInvitationUseCase = respondToOperatorInvitationUseCase;
+        this.getUserAssociatedShopsUseCase = getUserAssociatedShopsUseCase;
     }
 
     @PostMapping("/register")
@@ -63,6 +67,11 @@ public class ShopController {
     ) {
         User currentUser= UserCredentials.getCurrentUser();
         return ResponseEntity.ok(removeShopOperatorUseCase.execute(operatorId,shopId,currentUser));
+    }
+    @GetMapping("/all")
+    public ResponseEntity<List<ShopSummaryResponseDto>> getMyShops() {
+        User currentUser = UserCredentials.getCurrentUser();
+        return ResponseEntity.ok(getUserAssociatedShopsUseCase.execute(currentUser));
     }
 }
 
